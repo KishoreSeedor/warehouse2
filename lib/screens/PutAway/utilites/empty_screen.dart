@@ -7,7 +7,11 @@ class EmptyScreenPutAway extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(title),
+      child: Text(
+        title,
+        style: TextStyle(
+            color: Colors.blue, fontSize: 25, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }

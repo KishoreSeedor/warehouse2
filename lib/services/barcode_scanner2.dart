@@ -128,7 +128,7 @@ class _BarcodeScanner2State extends State<BarcodeScanner2> {
       _screenOpened = true;
       cameraController.dispose();
     }
-    //close the camera
+    //close the camera and added
 
     //open
 

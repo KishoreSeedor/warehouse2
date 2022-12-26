@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:warehouse/provider/barcode_provider.dart';
+import 'package:warehouse/screens/Count/Count_Provider/count_total_itemcount.dart';
 import 'package:warehouse/screens/PickOrder/pick_order_provider/pick_order_provider.dart';
 import 'package:warehouse/screens/PickOrder/pick_order_provider/pickorder_line_provider.dart';
 import 'package:warehouse/screens/PickOrder/pick_ui_design/pick_orders_screen.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: PickOrderLineProvider()),
         ChangeNotifierProvider.value(value: PutAwayOrderLineProvid()),
         ChangeNotifierProvider.value(value: barcodeprovider()),
+        ChangeNotifierProvider.value(value: CountTotalIdProvider()),
       ],
       child: MaterialApp(
         title: 'Warehouse',

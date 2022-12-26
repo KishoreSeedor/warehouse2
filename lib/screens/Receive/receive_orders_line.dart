@@ -203,6 +203,7 @@ class _OrdersLinePage1State extends State<OrdersLinePage1> {
                                         print(
                                             "snapLength ${snapshot.data!.length}");
                                         return ListView.separated(
+                                          reverse: true,
                                           shrinkWrap: true,
                                           itemBuilder: (context, index) {
                                             print(snapshot.data!.length);

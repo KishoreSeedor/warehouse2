@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:warehouse/screens/PutAway/put_away_model/putaway_orderline_model.dart';
 import 'package:warehouse/screens/PutAway/put_away_provider/put_away_orderline_provider.dart';
-
-import 'package:warehouse/screens/PutAway/put_away_provider/put_away_provider.dart';
-import 'package:warehouse/screens/PutAway/put_away_widget/bottom_widget_putaway.dart';
 import 'package:warehouse/screens/PutAway/put_away_widget/custom_putaway_button.dart';
 import 'package:warehouse/screens/PutAway/utilites/empty_screen.dart';
 import 'package:warehouse/screens/PutAway/utilites/error_screen.dart';
@@ -147,13 +144,16 @@ class _PutAwayOrdersLineScreenState extends State<PutAwayOrdersLineScreen> {
           ),
           Expanded(
             child: orderLine.orderlineLoading == true
-                ? LoadingScreenPutAway(title: 'Loading')
+                ? const Center(
+                    child: CircularProgressIndicator(color: CustomColor.yellow),
+                  )
                 : orderLine.orderlineErrorLoading == true
                     ? ErrorScreenPutAway(
                         title: orderLine.orderlIneErrorMessage.toString())
                     : orderLine.orderlineArrangement.isEmpty
                         ? EmptyScreenPutAway(title: 'No Product Found')
                         : ListView.separated(
+                            reverse: true,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
                               return PutAwayOrderLineProductWidget(

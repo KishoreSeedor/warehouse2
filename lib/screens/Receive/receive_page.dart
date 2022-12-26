@@ -305,6 +305,7 @@ class _ReceiveOrdersState extends State<ReceiveOrders> {
                       ),
                     )
                   : ListView.separated(
+                      reverse: true,
                       keyboardDismissBehavior:
                           ScrollViewKeyboardDismissBehavior.onDrag,
                       itemCount: snapshot.data!.length,
@@ -358,7 +359,13 @@ class _ReceiveOrdersState extends State<ReceiveOrders> {
                     );
             }
             return Center(
-              child: Text('Something went wrong'),
+              child: Text(
+                'Something went wrong',
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold),
+              ),
             );
           },
         ),
