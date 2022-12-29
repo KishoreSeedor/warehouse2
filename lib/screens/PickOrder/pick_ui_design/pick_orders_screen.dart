@@ -112,7 +112,6 @@ class _PickOrdersScreenState extends State<PickOrdersScreen> {
                       : value.pickOrder.isEmpty
                           ? EmptyScreenPutAway(title: 'No products')
                           : ListView.separated(
-                              reverse: true,
                               keyboardDismissBehavior:
                                   ScrollViewKeyboardDismissBehavior.onDrag,
                               itemCount: value.pickOrder.length,

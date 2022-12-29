@@ -153,7 +153,6 @@ class _PutAwayOrdersLineScreenState extends State<PutAwayOrdersLineScreen> {
                     : orderLine.orderlineArrangement.isEmpty
                         ? EmptyScreenPutAway(title: 'No Product Found')
                         : ListView.separated(
-                            reverse: true,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
                               return PutAwayOrderLineProductWidget(

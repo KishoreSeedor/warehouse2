@@ -112,7 +112,6 @@ class _PutAwayOrdersScreenState extends State<PutAwayOrdersScreen> {
                         title: 'No Products avalible',
                       )
                     : ListView.separated(
-                        reverse: true,
                         keyboardDismissBehavior:
                             ScrollViewKeyboardDismissBehavior.onDrag,
                         itemCount: data.putAwayOrderLine.length,

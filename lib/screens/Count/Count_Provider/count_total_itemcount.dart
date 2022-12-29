@@ -8,8 +8,8 @@ import '../../../provider/login_details.provider.dart';
 import 'package:http/http.dart' as https;
 
 class CountTotalIdProvider with ChangeNotifier {
-  CountTotalIdModel? _countTotalId;
-  CountTotalIdModel? get countTotalId {
+  CountTotalModel? _countTotalId;
+  CountTotalModel? get countTotalId {
     return _countTotalId;
   }
 
@@ -38,7 +38,7 @@ class CountTotalIdProvider with ChangeNotifier {
       final user = Provider.of<UserDetails>(context, listen: false);
       await user.getAllDetails();
       var claindId = user.id;
-      CountTotalIdModel getData;
+      CountTotalModel getData;
 
       var headers = {
         'Authorization': 'Bearer ocUHVoyTnMks1CmUFLLEqT4qNrUG7n',
@@ -52,11 +52,13 @@ class CountTotalIdProvider with ChangeNotifier {
           "countTotalId-->http://eiuat.seedors.com:8290/seedor-api/warehouse/total-warehouse/count?fields={'cnt_asn','cnt_grn','cnt_del','cnt_stock'}&clientid=$claindId");
       var jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
-        getData = (CountTotalIdModel(
-            asn: jsonData[0]["cnt_asn"].toString(),
-            grn: jsonData[0]["cnt_grn"].toString(),
-            delivery: jsonData[0]["cnt_del"].toString(),
-            inStock: jsonData[0]["cnt_stock"].toString()));
+        getData = (CountTotalModel(
+          asn: jsonData[0]["cnt_asn"].toString(),
+          grn: jsonData[0]["cnt_grn"].toString(),
+          delivery: jsonData[0]["cnt_del"].toString(),
+          inStock: jsonData[0]["cnt_stock"].toString(),
+          id: jsonData[0]["id"].toString(),
+        ));
         _countTotalId = getData;
         _countIdLoading = false;
         notifyListeners();

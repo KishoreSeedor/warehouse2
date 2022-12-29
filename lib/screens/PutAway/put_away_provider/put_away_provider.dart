@@ -50,6 +50,7 @@ class PutAwayProvider with ChangeNotifier {
       print(
           "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','2')]");
       var jsonData = json.decode(response.body);
+      // print(jsonData['location_barcode'].toString());
       if (response.statusCode == 200) {
         print(response.body);
         print(jsonData.length);
@@ -117,6 +118,7 @@ class PutAwayProvider with ChangeNotifier {
       _orderlIneErrorMessage = "Invalid Data Format";
       notifyListeners();
     } catch (e) {
+      print(e);
       _orderlineLoading = false;
       _orderlineErrorLoading = false;
       _orderlIneErrorMessage = "Some thing went wtong";

@@ -3,6 +3,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warehouse/screens/Count/Count_Ui_desgin/count_company_screen.dart';
+import 'package:warehouse/screens/Count/customerCountScreen/Customercountscreen/customer_count_screen.dart';
+import 'package:warehouse/screens/Count/inventryProductScreen/inventry_order_screen.dart';
 import 'package:warehouse/screens/PickOrder/pick_model/pick_oder_model.dart';
 import 'package:warehouse/screens/login_page.dart';
 import 'package:warehouse/widgets/custom_alert_dialog.dart';
@@ -312,11 +314,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CountCompanyName()));
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (ctx) => const InventryOrderScreen()));
                         },
                         child: Card(
                           elevation: 7,

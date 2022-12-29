@@ -1,14 +1,17 @@
 import 'package:flutter/cupertino.dart';
 
-class CountTotalIdModel with ChangeNotifier {
+class CountTotalModel with ChangeNotifier {
   String asn;
   String grn;
   String delivery;
   String inStock;
+  String id;
 
-  CountTotalIdModel(
-      {required this.asn,
-      required this.grn,
-      required this.delivery,
-      required this.inStock});
+  CountTotalModel({
+    required this.asn,
+    required this.grn,
+    required this.delivery,
+    required this.inStock,
+    required this.id,
+  });
 }

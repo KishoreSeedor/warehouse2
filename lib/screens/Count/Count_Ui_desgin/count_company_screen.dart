@@ -156,7 +156,7 @@ class _CountCompanyNameState extends State<CountCompanyName> {
                             child: Text(
                               totalId.countTotalId!.asn.toString(),
                               textAlign: TextAlign.center,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500),

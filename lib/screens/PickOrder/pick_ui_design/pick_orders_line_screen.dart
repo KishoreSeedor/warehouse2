@@ -158,7 +158,6 @@ class _PickOrderLinesScreenState extends State<PickOrderLinesScreen> {
                     : pickData.orderlineArrangement.isEmpty
                         ? EmptyScreenPutAway(title: "No Product Found")
                         : ListView.separated(
-                            reverse: true,
                             itemCount: pickData.orderlineArrangement.length,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {

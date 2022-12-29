@@ -76,7 +76,7 @@ class PickOrderLineProvider with ChangeNotifier {
           }
           getData.add(PickLinesModel(
             id: jsonData[i]['id'].toString(),
-            locationDest: jsonData[i]['location_dest_id'][0].toString(),
+            locationDest: jsonData[i]['location_barcode'].toString(),
             locationDestinationName:
                 jsonData[i]['location_dest_id'][1].toString(),
             productId: jsonData[i]['product_id'][0].toString(),

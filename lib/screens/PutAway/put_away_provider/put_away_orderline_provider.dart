@@ -65,15 +65,20 @@ class PutAwayOrderLineProvid with ChangeNotifier {
         print(response.body);
 
         var jsonData = json.decode(response.body);
+        print(jsonData[0]['location_barcode'].toString() +
+            '---->> LOCATION BARECODE');
         for (var i = 0; i < jsonData.length; i++) {
           _loaddata.add(PutawayOrderLineModel(
-              id: jsonData[i]['id'].toString(),
-              locationDest: jsonData[i]['location_dest_id'][0].toString(),
-              locationDestinationName:
-                  jsonData[i]['location_dest_id'][1].toString(),
-              productname: jsonData[i]['product_id'][1].toString(),
-              quantity: jsonData[i]['product_qty'].toString(),
-              productId: jsonData[i]['product_id'][0].toString()));
+            id: jsonData[i]['id'].toString(),
+            locationBarcode: jsonData[i]['location_barcode'].toString(),
+            locationDest: jsonData[i]['location_dest_id'][0].toString(),
+            locationDestinationName:
+                jsonData[i]['location_dest_id'][1].toString(),
+            productname: jsonData[i]['product_id'][1].toString(),
+            quantity: jsonData[i]['product_qty'].toString(),
+            productId: jsonData[i]['product_id'][0].toString(),
+            skuId: jsonData[i]['x_sku_id'][1].toString(),
+          ));
         }
 
         _allOrderLineProd = _loaddata;

@@ -305,7 +305,6 @@ class _ReceiveOrdersState extends State<ReceiveOrders> {
                       ),
                     )
                   : ListView.separated(
-                      reverse: true,
                       keyboardDismissBehavior:
                           ScrollViewKeyboardDismissBehavior.onDrag,
                       itemCount: snapshot.data!.length,
