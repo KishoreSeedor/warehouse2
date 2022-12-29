@@ -81,7 +81,6 @@ class _LoginPageState extends State<LoginPage> {
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
-          reverse: true,
           child: Form(
             key: _fromKey,
             child: Column(

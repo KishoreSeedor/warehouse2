@@ -52,21 +52,6 @@ class _CountOrederLineState extends State<CountOrederLine> {
                     // ignore: prefer_const_literals_to_create_immutables
                     children: [
                       // ignore: unrelated_type_equality_checks
-
-                      Text(
-                        "1",
-                        style: const TextStyle(
-                            color: CustomColor.blackcolor,
-                            fontSize: 23,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        "/2",
-                        style: TextStyle(
-                            color: CustomColor.blackcolor,
-                            fontSize: 23,
-                            fontWeight: FontWeight.bold),
-                      ),
                     ],
                   ),
                 ),
@@ -139,9 +124,7 @@ class _CountOrederLineState extends State<CountOrederLine> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            opaquePage(ScanCountContainer(
-                              barcodeValue: barcodeValue.toString(),
-                            )),
+                            opaquePage(ScanCountContainer()),
                           );
                         },
                         child: Container(

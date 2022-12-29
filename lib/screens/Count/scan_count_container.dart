@@ -6,11 +6,8 @@ import '../../services/bar_code_scanner_alert.dart';
 import '../PickOrder/scanSerial.dart';
 
 class ScanCountContainer extends StatefulWidget {
-  String? barcodeValue;
-
   ScanCountContainer({
     super.key,
-    required String barcodeValue,
   });
 
   @override
@@ -122,7 +119,6 @@ class _ScanCountContainerState extends State<ScanCountContainer> {
                                     show = false;
                                   }
                                 },
-                                controller: barcodecontroller,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                     suffixText: "Scan Barcode",
@@ -146,9 +142,9 @@ class _ScanCountContainerState extends State<ScanCountContainer> {
                                               );
                                             },
                                           )
-                                        : Container(),
+                                        : null,
                                     prefixIcon: show
-                                        ? Container()
+                                        ? null
                                         : IconButton(
                                             iconSize: 50,
                                             icon: Image.asset(
@@ -168,7 +164,7 @@ class _ScanCountContainerState extends State<ScanCountContainer> {
                               ),
                             ),
                           ),
-                          Expanded(
+                          const Expanded(
                             flex: 2,
                             child: Text(
                               "Scan tha Bin you are Takeing the item from.",

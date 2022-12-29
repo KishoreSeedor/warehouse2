@@ -23,6 +23,7 @@ class CustomColor {
   static const grayword = Color(0xFF949494);
   static const graybox = Color(0xFFD9D9D9);
   static const dimensionColor = Color(0xFF0A0078);
+  static const blueColor = Color(0xFF0A0078);
   static const dimensionColor2 = Color.fromARGB(255, 176, 169, 254);
   static const darkword = Color.fromARGB(255, 123, 123, 123);
 }

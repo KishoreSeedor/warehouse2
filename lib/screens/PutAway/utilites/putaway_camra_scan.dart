@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
+import 'package:warehouse/screens/PutAway/put_away_model/put_away_orderline_model.dart';
 import 'package:warehouse/screens/PutAway/put_away_provider/put_away_orderline_provider.dart';
 import 'package:warehouse/screens/PutAway/put_away_widget/custom_putaway_button.dart';
 import 'package:warehouse/widgets/custom_alert_dialog.dart';
 
 import '../../../const/color.dart';
+import '../put_away_model/putaway_orderline_model.dart';
 
 class PutAwayBarCodeScanner extends StatefulWidget {
   String scanValue;
@@ -18,14 +20,69 @@ class PutAwayBarCodeScanner extends StatefulWidget {
 class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
   final TextEditingController locationController = TextEditingController();
   MobileScannerController cameraController = MobileScannerController();
+  PutawayOrderLineModel? putAwayOrdersModel;
   String locationDestination = '';
   Future<void> productUpdate({required String id}) async {
     final data = Provider.of<PutAwayOrderLineProvid>(context, listen: false);
-    if (locationDestination == id) {
+    if (locationDestination.substring(0, 3).toLowerCase().toString() == 'loc') {
+      if (id.substring(0, 3).toLowerCase().toString() == 'sku') {
+        for (var i = 0; i < data.allOrderLineProd.length; i++) {
+          if (data.allOrderLineProd[i].skuId == id) {
+            putAwayOrdersModel = data.allOrderLineProd[i];
+            setState(() {});
+            break;
+          }
+        }
+        if (locationDestination == putAwayOrdersModel!.locationBarcode) {
+          await data.correctproductUpdateInpallet(
+              context: context, id: putAwayOrdersModel!.id);
+        } else {
+          MyCustomAlertDialog().showCustomAlertdialog(
+              context: context,
+              title: 'Note',
+              button: true,
+              onTapCancelButt: () {
+                Navigator.of(context).pop();
+              },
+              subtitle:
+                  'The entered Bin $locationDestination does not match the expected value $id. Do you want to use it anyway',
+              onTapOkButt: () {
+                data.wrongproductUpdateInPallet(
+                    context: context, id: id, locationId: locationDestination);
+              });
+        }
+      } else {
+        MyCustomAlertDialog().showCustomAlertdialog(
+            context: context,
+            title: 'Note',
+            button: true,
+            onTapCancelButt: () {
+              Navigator.of(context).pop();
+            },
+            subtitle: 'Please scan the correct product',
+            onTapOkButt: () {
+              Navigator.of(context).pop();
+              // data.wrongproductUpdateInPallet(
+              //     context: context, id: id, locationId: locationDestination);
+            });
+      }
+
       print('------CORRECT LOCATION---');
-      data.correctproductUpdateInpallet(context: context, id: id);
     } else {
       print('------WRONG LOCATION---');
+      // MyCustomAlertDialog().showCustomAlertdialog(
+      //     context: context,
+      //     title: 'Note',
+      //     button: true,
+      //     onTapCancelButt: () {
+      //       Navigator.of(context).pop();
+      //     },
+      //     subtitle:
+      //         'The entered Bin $locationDestination does not match the expected value $id. Do you want to use it anyway',
+      //     onTapOkButt: () {
+      //       data.wrongproductUpdateInPallet(
+      //           context: context, id: id, locationId: locationDestination);
+      //     });
       MyCustomAlertDialog().showCustomAlertdialog(
           context: context,
           title: 'Note',
@@ -33,11 +90,11 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
           onTapCancelButt: () {
             Navigator.of(context).pop();
           },
-          subtitle:
-              'The entered Bin $locationDestination does not match the expected value $id. Do you want to use it anyway',
+          subtitle: 'Please scan the correct location',
           onTapOkButt: () {
-            data.wrongproductUpdateInPallet(
-                context: context, id: id, locationId: locationDestination);
+            Navigator.of(context).pop();
+            // data.wrongproductUpdateInPallet(
+            //     context: context, id: id, locationId: locationDestination);
           });
     }
   }

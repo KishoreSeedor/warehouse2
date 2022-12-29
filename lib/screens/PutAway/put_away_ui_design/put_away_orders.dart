@@ -75,33 +75,42 @@ class _PutAwayOrdersScreenState extends State<PutAwayOrdersScreen> {
           actions: [
             Row(
               children: [
-                Text(
-                  data.putAwayOrderLine.length.toString(),
-                  style: const TextStyle(
-                      color: CustomColor.blackcolor2,
-                      fontSize: 23,
-                      fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: Image.asset(
-                    "assets/images/fillter.png",
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Text(
+                    data.putAwayOrderLine.length.toString(),
+                    style: const TextStyle(
+                        color: CustomColor.blackcolor2,
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _visible = !_visible;
-                    });
-                  },
                 ),
+                // IconButton(
+                //   icon: Image.asset(
+                //     "assets/images/fillter.png",
+                //   ),
+                //   onPressed: () {
+                //     setState(() {
+                //       _visible = !_visible;
+                //     });
+                //   },
+                // ),
               ],
             ),
           ],
         ),
         body: data.orderlineLoading
-            ? LoadingScreenPutAway(title: 'Loading')
+            ? Center(
+                child: CircularProgressIndicator(
+                  color: CustomColor.yellow,
+                ),
+              )
             : data.orderlineErrorLoading
                 ? ErrorScreenPutAway(title: data.orderlIneErrorMessage)
                 : data.putAwayOrderLine.isEmpty
-                    ? EmptyScreenPutAway(title: 'No Products avalible')
+                    ? EmptyScreenPutAway(
+                        title: 'No Products avalible',
+                      )
                     : ListView.separated(
                         keyboardDismissBehavior:
                             ScrollViewKeyboardDismissBehavior.onDrag,

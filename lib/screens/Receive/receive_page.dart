@@ -358,7 +358,13 @@ class _ReceiveOrdersState extends State<ReceiveOrders> {
                     );
             }
             return Center(
-              child: Text('Something went wrong'),
+              child: Text(
+                'Something went wrong',
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold),
+              ),
             );
           },
         ),

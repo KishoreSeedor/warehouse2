@@ -13,13 +13,29 @@ class CustomAlertDialog {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(title),
-            content: Text(content),
+            title: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              content,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+            ),
             actions: [
-              twoButton
-                  ? ElevatedButton(onPressed: () {}, child: Text('Cancel'))
-                  : Container(),
-              ElevatedButton(onPressed: () {}, child: Text('Ok'))
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  twoButton
+                      ? ElevatedButton(onPressed: () {}, child: Text('Cancel'))
+                      : Container(),
+                  SizedBox(
+                    width: 15,
+                  ),
+                  ElevatedButton(onPressed: () {}, child: Text('Ok'))
+                ],
+              ),
             ],
           );
         });
@@ -40,17 +56,33 @@ class MyCustomAlertDialog {
             barrierDismissible: false,
             context: context,
             builder: (context) => CupertinoAlertDialog(
-              title: Text(title),
-              content: Text(subtitle),
+              title: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              content: Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+              ),
               actions: <Widget>[
-                if (button == true)
-                  CupertinoDialogAction(
-                    child: const Text('Cancel'),
-                    onPressed: () => onTapCancelButt!(),
-                  ),
-                CupertinoDialogAction(
-                  child: const Text('Ok'),
-                  onPressed: () => onTapOkButt(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (button == true)
+                      CupertinoDialogAction(
+                        child: const Text('Cancel'),
+                        onPressed: () => onTapCancelButt!(),
+                      ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    CupertinoDialogAction(
+                      child: const Text('Ok'),
+                      onPressed: () => onTapOkButt(),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -60,17 +92,33 @@ class MyCustomAlertDialog {
             context: context,
             builder: (context) {
               return AlertDialog(
-                  title: Text(title),
-                  content: Text(subtitle),
+                  title: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  content: Text(
+                    subtitle,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                  ),
                   actions: <Widget>[
-                    if (button == true)
-                      ElevatedButton(
-                        child: const Text('Cancel'),
-                        onPressed: () => onTapCancelButt!(),
-                      ),
-                    ElevatedButton(
-                      child: const Text('Ok'),
-                      onPressed: () => onTapOkButt(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (button == true)
+                          ElevatedButton(
+                            child: const Text('Cancel'),
+                            onPressed: () => onTapCancelButt!(),
+                          ),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        ElevatedButton(
+                          child: const Text('Ok'),
+                          onPressed: () => onTapOkButt(),
+                        ),
+                      ],
                     ),
                   ]);
             });

@@ -749,16 +749,17 @@ class GlobalAlertBox {
                                                 color: CustomColor.blackcolor),
                                           ),
                                         ),
-                                        // Padding(
-                                        //   padding: const EdgeInsets.all(10),
-                                        //   child: IconButton(
-                                        //       onPressed: () {
-                                        //         Navigator.pop(context);
-                                        //       },
-                                        //       icon: Image.asset(
-                                        //         "assets/images/close.png",
-                                        //       )),
-                                        // )
+                                        IconButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          icon: Padding(
+                                            padding:
+                                                EdgeInsets.all(height * 0.004),
+                                            child: Image.asset(
+                                                "assets/images/close.png"),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -1181,7 +1182,9 @@ class _QualityContainerState extends State<QualityContainer> {
         .qualityCheck(context: context, userId: widget.userId)
         .then((value) {
       final question = Provider.of<RecieveAPI>(context, listen: false);
+
       if (question.ques.isEmpty) {
+        Text("No questions founded");
       } else {
         qualityFuture2 = RecieveAPI().qualityCheckValue(
             context: context,
@@ -1197,11 +1200,6 @@ class _QualityContainerState extends State<QualityContainer> {
   }
 
   int selectindex = 0;
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1229,235 +1227,332 @@ class _QualityContainerState extends State<QualityContainer> {
                           context: context, userId: widget.userId),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          if (selectindex < snapshot.data!.length) {
-                            questionDetailis = snapshot.data!;
-                            print(
-                                'questionsssss ${selectindex < snapshot.data!.length}');
+                          if (snapshot.data!.isEmpty) {
+                            print('print data hello world');
                             return Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Container(
-                                  decoration: const BoxDecoration(
-                                      color: CustomColor.graybox,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10))),
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.06,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.only(left: width * 0.05),
-                                        child: const Text(
-                                          "Quality Check",
-                                          style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              color: CustomColor.blackcolor),
-                                        ),
-                                      ),
-                                    ],
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(
+                                    'No Question in This Prodect',
+                                    style: TextStyle(
+                                        color: CustomColor.blueColor,
+                                        fontSize: 20),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        question.ques[selectindex].questions,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            color: CustomColor.blackcolor,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.05,
-                                            vertical: width * 0.1),
-                                        child: Form(
-                                          key: _dropdownFormKey,
-                                          child: FutureBuilder<
-                                                  List<QualityQuestionsValue?>>(
-                                              future: qualityFuture2,
-                                              builder: (context, snapshot) {
-                                                if (snapshot.connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return Center(
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      color: CustomColor.yellow,
-                                                    ),
-                                                  );
-                                                } else if (snapshot.hasData) {
-                                                  return DropdownButtonFormField(
-                                                      isExpanded: true,
-                                                      icon: const Visibility(
-                                                          visible: false,
-                                                          child: Icon(Icons
-                                                              .arrow_downward)),
-                                                      hint: const Text(
-                                                        "choose",
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: CustomColor
-                                                                .blackcolor),
-                                                      ),
-                                                      alignment: Alignment
-                                                          .center,
-                                                      decoration:
-                                                          InputDecoration(
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            18),
-                                                              ),
-                                                              fillColor:
-                                                                  CustomColor
-                                                                      .appbarColor,
-                                                              filled: true,
-                                                              contentPadding:
-                                                                  EdgeInsets.symmetric(
-                                                                      vertical:
-                                                                          height *
-                                                                              0.001),
-                                                              enabledBorder: OutlineInputBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              18))),
-
-                                                      // value: snapshot.data![index]!.questions,
-                                                      items: snapshot.data!
-                                                          .map((e) =>
-                                                              DropdownMenuItem<
-                                                                  String>(
-                                                                enabled: true,
-                                                                value: e!.id,
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    e.questions,
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style: const TextStyle(
-                                                                        fontSize:
-                                                                            18,
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                                  ),
-                                                                ),
-                                                              ))
-                                                          .toList(),
-                                                      value: selectedValue,
-                                                      onChanged: (newValue) {
-                                                        FocusScope.of(context)
-                                                            .requestFocus(
-                                                                FocusNode());
-                                                        setState(() {
-                                                          selectedValue =
-                                                              newValue;
-                                                          chooseValue =
-                                                              selectedValue
-                                                                  .toString();
-                                                          print(
-                                                              "choosevalue--> $chooseValue");
-                                                        });
-                                                      });
-                                                } else {
-                                                  return Container();
-                                                }
-                                              }),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        "Feedback",
-                                        style: TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.only(top: height * 0.01),
-                                        child: SizedBox(
-                                          //height: cann't be changeable,
-                                          width: width * 0.85,
-                                          child: TextField(
-                                            controller: feedbackController,
-                                            onSubmitted: (e) {
-                                              feedbackController.text = e;
-                                              // feedBackValueText =
-                                              //     feedbackController.text;
-                                            },
-                                            textAlign: TextAlign.start,
-                                            keyboardType: TextInputType.name,
-                                            decoration: InputDecoration(
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-
-                                                // hintStyle: const TextStyle(
-                                                //     color: CustomColor
-                                                //         .dimensionColor,
-                                                //     fontSize: 18,
-                                                //     fontWeight:
-                                                //         FontWeight.bold),
-                                                // hintText:
-                                                //     feedBackValueText.isEmpty
-                                                //         ? ""
-                                                //         : feedBackValueText,
-                                                fillColor: Colors.white70),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 30),
+                                )
+                              ],
+                            );
+                          } else {
+                            if (selectindex < snapshot.data!.length) {
+                              questionDetailis = snapshot.data!;
+                              print(
+                                  'questionsssss ${selectindex < snapshot.data!.length}');
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                        color: CustomColor.graybox,
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10))),
+                                    height: MediaQuery.of(context).size.height *
+                                        0.06,
                                     child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        InkWell(
-                                          onTap: () {
-                                            if (selectindex == 0) {
-                                              Navigator.pop(context);
-                                            } else {
-                                              setState(() {
-                                                selectindex -= 1;
-                                              });
-                                            }
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: const Text(
+                                            "Quality Check",
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: CustomColor.blackcolor),
+                                          ),
+                                        ),
+                                        const Expanded(
+                                          flex: 8,
+                                          child: Text(""),
+                                        ),
+                                        IconButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
                                           },
-                                          child: Container(
+                                          icon: Padding(
+                                            padding:
+                                                EdgeInsets.all(height * 0.004),
+                                            child: Image.asset(
+                                                "assets/images/close.png"),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 4,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          question.ques[selectindex].questions,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: CustomColor.blackcolor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: height * 0.05,
+                                              vertical: width * 0.1),
+                                          child: Form(
+                                            key: _dropdownFormKey,
+                                            child: FutureBuilder<
+                                                    List<
+                                                        QualityQuestionsValue?>>(
+                                                future: qualityFuture2,
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        color:
+                                                            CustomColor.yellow,
+                                                      ),
+                                                    );
+                                                  } else if (snapshot.hasData) {
+                                                    return DropdownButtonFormField(
+                                                        isExpanded: true,
+                                                        icon: const Visibility(
+                                                            visible: false,
+                                                            child: Icon(Icons
+                                                                .arrow_downward)),
+                                                        hint: const Text(
+                                                          "choose",
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: CustomColor
+                                                                  .blackcolor),
+                                                        ),
+                                                        alignment: Alignment
+                                                            .center,
+                                                        decoration:
+                                                            InputDecoration(
+                                                                border:
+                                                                    OutlineInputBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              18),
+                                                                ),
+                                                                fillColor:
+                                                                    CustomColor
+                                                                        .appbarColor,
+                                                                filled: true,
+                                                                contentPadding:
+                                                                    EdgeInsets.symmetric(
+                                                                        vertical: height *
+                                                                            0.001),
+                                                                enabledBorder: OutlineInputBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            18))),
+
+                                                        // value: snapshot.data![index]!.questions,
+                                                        items: snapshot.data!
+                                                            .map((e) =>
+                                                                DropdownMenuItem<
+                                                                    String>(
+                                                                  enabled: true,
+                                                                  value: e!.id,
+                                                                  child: Center(
+                                                                    child: Text(
+                                                                      e.questions,
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: const TextStyle(
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                  ),
+                                                                ))
+                                                            .toList(),
+                                                        value: selectedValue,
+                                                        onChanged: (newValue) {
+                                                          FocusScope.of(context)
+                                                              .requestFocus(
+                                                                  FocusNode());
+                                                          setState(() {
+                                                            selectedValue =
+                                                                newValue;
+                                                            chooseValue =
+                                                                selectedValue
+                                                                    .toString();
+                                                            print(
+                                                                "choosevalue--> $chooseValue");
+                                                          });
+                                                        });
+                                                  } else {
+                                                    return SizedBox(
+                                                      height: height * 0.05,
+                                                      width: width * 0.1,
+                                                      child: TextButton(
+                                                          style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all<Color>(CustomColor
+                                                                      .graybox),
+                                                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                          18.0),
+                                                                  side: BorderSide(
+                                                                      color: Colors
+                                                                          .black)))),
+                                                          onPressed: () {
+                                                            setState(() {});
+                                                            RecieveAPI().qualityCheckValue(
+                                                                context:
+                                                                    context,
+                                                                userId: widget
+                                                                    .userId,
+                                                                valuesId: question
+                                                                    .ques[
+                                                                        selectindex]
+                                                                    .value);
+                                                          },
+                                                          child: Image.asset(
+                                                              "assets/images/reload.png")),
+                                                    );
+                                                  }
+                                                }),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          "Feedback",
+                                          style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              top: height * 0.01),
+                                          child: SizedBox(
+                                            //height: cann't be changeable,
+                                            width: width * 0.85,
+                                            child: TextField(
+                                              controller: feedbackController,
+                                              onSubmitted: (e) {
+                                                feedbackController.text = e;
+                                                // feedBackValueText =
+                                                //     feedbackController.text;
+                                              },
+                                              textAlign: TextAlign.start,
+                                              keyboardType: TextInputType.name,
+                                              decoration: InputDecoration(
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+
+                                                  // hintStyle: const TextStyle(
+                                                  //     color: CustomColor
+                                                  //         .dimensionColor,
+                                                  //     fontSize: 18,
+                                                  //     fontWeight:
+                                                  //         FontWeight.bold),
+                                                  // hintText:
+                                                  //     feedBackValueText.isEmpty
+                                                  //         ? ""
+                                                  //         : feedBackValueText,
+                                                  fillColor: Colors.white70),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 30),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              if (selectindex == 0) {
+                                                Navigator.pop(context);
+                                              } else {
+                                                setState(() {
+                                                  selectindex -= 1;
+                                                });
+                                              }
+                                            },
+                                            child: Container(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.05,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.18,
+                                              decoration: BoxDecoration(
+                                                  color: selectindex == 0
+                                                      ? CustomColor.graybox
+                                                      : CustomColor.greencolor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Image.asset(
+                                                  "assets/images/back_image.png",
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const Text(
+                                            ".",
+                                            style: TextStyle(fontSize: 50),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          Container(
                                             height: MediaQuery.of(context)
                                                     .size
                                                     .height *
@@ -1467,88 +1562,17 @@ class _QualityContainerState extends State<QualityContainer> {
                                                     .width *
                                                 0.18,
                                             decoration: BoxDecoration(
-                                                color: selectindex == 0
-                                                    ? CustomColor.graybox
-                                                    : CustomColor.greencolor,
+                                                color: CustomColor.boxGreen,
                                                 borderRadius:
                                                     BorderRadius.circular(10)),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Image.asset(
-                                                "assets/images/back_image.png",
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const Text(
-                                          ".",
-                                          style: TextStyle(fontSize: 50),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.05,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.18,
-                                          decoration: BoxDecoration(
-                                              color: CustomColor.boxGreen,
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: TextButton(
-                                              onPressed: () {
-                                                print(
-                                                    "select-->${selectindex + 1}");
-                                                if (selectindex ==
-                                                    question.ques.length) {
+                                            child: TextButton(
+                                                onPressed: () {
                                                   print(
-                                                      "question length-->${question.ques.length}");
-                                                  RecieveAPI()
-                                                      .qualityValueGet(
-                                                    context: context,
-                                                    feedBack: feedbackController
-                                                        .text
-                                                        .toString(),
-                                                    questionId: question
-                                                        .ques[selectindex].id,
-                                                    answerId:
-                                                        chooseValue.toString(),
-                                                    userId: widget.userId
-                                                        .toString(),
-                                                  )
-                                                      .then((value) {
-                                                    chooseValue = null;
-                                                    Navigator.pushReplacement(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                OrdersLinePage1(
-                                                                    barcode: widget
-                                                                        .barcode,
-                                                                    id: widget
-                                                                        .userId)));
-                                                  });
-                                                } else {
-                                                  if (chooseValue == null) {
-                                                    MyCustomAlertDialog()
-                                                        .showCustomAlertdialog(
-                                                            context: context,
-                                                            title: 'Question',
-                                                            subtitle:
-                                                                'Please select any answer given Dropdown',
-                                                            onTapOkButt: () {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                            });
-                                                  } else {
+                                                      "select-->${selectindex + 1}");
+                                                  if (selectindex ==
+                                                      question.ques.length) {
                                                     print(
-                                                        '------->>>>page change');
-
+                                                        "question length-->${question.ques.length}");
                                                     RecieveAPI()
                                                         .qualityValueGet(
                                                       context: context,
@@ -1564,63 +1588,110 @@ class _QualityContainerState extends State<QualityContainer> {
                                                           .toString(),
                                                     )
                                                         .then((value) {
-                                                      print(
-                                                          '$chooseValue------->>>> then function');
-                                                      if (value == 200) {
-                                                        setState(() {
-                                                          selectindex += 1;
-                                                        });
-                                                        feedbackController
-                                                            .text = '';
-                                                        chooseValue = null;
-                                                        selectedValue = null;
-                                                        widget.feedBackvalue!
-                                                            .text = '';
-                                                        print(selectedValue
-                                                                .toString() +
-                                                            '----->>> choosen value');
-                                                        print(chooseValue
-                                                                .toString() +
-                                                            '----->>> choosen value');
-                                                        setState(() {});
-                                                      } else {
-                                                        MyCustomAlertDialog()
-                                                            .showCustomAlertdialog(
-                                                                context:
-                                                                    context,
-                                                                title:
-                                                                    'Question',
-                                                                subtitle:
-                                                                    'Something went wrong',
-                                                                onTapOkButt:
-                                                                    () {
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop();
-                                                                });
-                                                      }
+                                                      chooseValue = null;
+                                                      Navigator.pushReplacement(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  OrdersLinePage1(
+                                                                      barcode:
+                                                                          widget
+                                                                              .barcode,
+                                                                      id: widget
+                                                                          .userId)));
                                                     });
+                                                  } else {
+                                                    if (chooseValue == null) {
+                                                      MyCustomAlertDialog()
+                                                          .showCustomAlertdialog(
+                                                              context: context,
+                                                              title: 'Question',
+                                                              subtitle:
+                                                                  'Please select an answer from the given Drop-down',
+                                                              onTapOkButt: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              });
+                                                    } else {
+                                                      print(
+                                                          '------->>>>page change');
+
+                                                      RecieveAPI()
+                                                          .qualityValueGet(
+                                                        context: context,
+                                                        feedBack:
+                                                            feedbackController
+                                                                .text
+                                                                .toString(),
+                                                        questionId: question
+                                                            .ques[selectindex]
+                                                            .id,
+                                                        answerId: chooseValue
+                                                            .toString(),
+                                                        userId: widget.userId
+                                                            .toString(),
+                                                      )
+                                                          .then((value) {
+                                                        print(
+                                                            '$chooseValue------->>>> then function');
+                                                        if (value == 200) {
+                                                          setState(() {
+                                                            selectindex += 1;
+                                                          });
+                                                          feedbackController
+                                                              .text = '';
+                                                          chooseValue = null;
+                                                          selectedValue = null;
+                                                          widget.feedBackvalue!
+                                                              .text = '';
+                                                          print(selectedValue
+                                                                  .toString() +
+                                                              '----->>> choosen value');
+                                                          print(chooseValue
+                                                                  .toString() +
+                                                              '----->>> choosen value');
+                                                          setState(() {});
+                                                        } else {
+                                                          MyCustomAlertDialog()
+                                                              .showCustomAlertdialog(
+                                                                  context:
+                                                                      context,
+                                                                  title:
+                                                                      'Question',
+                                                                  subtitle:
+                                                                      'Something went wrong',
+                                                                  onTapOkButt:
+                                                                      () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                  });
+                                                        }
+                                                      });
+                                                    }
                                                   }
-                                                }
-                                              },
-                                              child: question.ques.length - 1 ==
-                                                      selectindex
-                                                  ? Image.asset(
-                                                      "assets/images/tick.png",
-                                                    )
-                                                  : Image.asset(
-                                                      "assets/images/front.png",
-                                                    )),
-                                        ),
-                                      ],
+                                                },
+                                                child:
+                                                    question.ques.length - 1 ==
+                                                            selectindex
+                                                        ? Image.asset(
+                                                            "assets/images/tick.png",
+                                                          )
+                                                        : Image.asset(
+                                                            "assets/images/front.png",
+                                                          )),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            );
-                          } else {
-                            // Navigator.pop(context);
-                            Navigator.pop(context);
+                                ],
+                              );
+                            } else {
+                              // Navigator.pop(context);
+                              Navigator.pop(context);
+                            }
                           }
                         }
                         return Center(

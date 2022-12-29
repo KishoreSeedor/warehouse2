@@ -234,13 +234,6 @@ class _CountOrdersState extends State<CountOrders> {
             actions: [
               Row(
                 children: [
-                  Text(
-                    "1",
-                    style: const TextStyle(
-                        color: CustomColor.blackcolor2,
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold),
-                  ),
                   IconButton(
                     icon: Image.asset(
                       "assets/images/fillter.png",
