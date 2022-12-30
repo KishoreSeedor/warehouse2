@@ -42,10 +42,8 @@ class AuthProvider with ChangeNotifier {
         'mobile': phoneNumber,
       });
 
-      var response = await http.post(
-          Uri.parse("http://eiuat.seedors.com:8290/customer-signup"),
-          body: body,
-          headers: header);
+      var response = await http.post(Uri.parse("$baseApiUrl/customer-signup"),
+          body: body, headers: header);
       // ignore: unrelated_type_equality_checks
       if (response.body == 200) {
         Navigator.of(context).pop();
@@ -97,11 +95,9 @@ class AuthProvider with ChangeNotifier {
         // 'client_id': clind_id
       });
       debugPrint(body.toString());
-      var response = await http.post(
-          Uri.parse('http://eiuat.seedors.com:8290/seedor-api-login'),
-          headers: header,
-          body: body);
-      debugPrint("http://eiuat.seedors.com:8290/seedor-api-login");
+      var response = await http.post(Uri.parse('$baseApiUrl/seedor-api-login'),
+          headers: header, body: body);
+      debugPrint("$baseApiUrl/seedor-api-login");
       debugPrint("${response.body}hauwhdoaodhu");
       var jsonData = json.decode(response.body);
       if (response.statusCode == 200) {

@@ -134,7 +134,7 @@ class _ScanSerialBoxState extends State<ScanSerialBox> {
                                     show = false;
                                   }
                                 },
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.name,
                                 decoration: InputDecoration(
                                     suffixText: "Scan Barcode",
                                     labelText: "Type or scan barcode",
@@ -270,7 +270,7 @@ class _ScanSerialBoxState extends State<ScanSerialBox> {
                                   }
                                 },
                                 controller: quantitycontroller,
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.name,
                                 decoration: const InputDecoration(
                                   floatingLabelBehavior:
                                       FloatingLabelBehavior.never,

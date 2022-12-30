@@ -27,9 +27,9 @@ class _PickProdLocationScannerState extends State<PickProdLocationScanner> {
   Future<dynamic> productGet({required String location}) async {
     final data = Provider.of<PickOrderLineProvider>(context, listen: false);
     for (var i = 0; i < data.pickLine.length; i++) {
-      // if (location == data.pickLine[i].locationId) {
-      listOfProduct.add(data.pickLine[i]);
-      // }
+      if (location == data.pickLine[i].locationDest) {
+        listOfProduct.add(data.pickLine[i]);
+      }
     }
     print('dataa----');
   }
@@ -187,8 +187,9 @@ class _PickProdLocationScannerState extends State<PickProdLocationScanner> {
                               onPressed: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (ctx) => PickProductScanWidget(
-                                          productId:
-                                              listOfProduct[index].productId,
+                                          productId: listOfProduct[index].id,
+                                          locationDesId:
+                                              listOfProduct[index].locationDest,
                                         )));
                               },
                               icon: Image.asset(

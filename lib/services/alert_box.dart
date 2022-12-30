@@ -1187,9 +1187,7 @@ class _QualityContainerState extends State<QualityContainer> {
         Text("No questions founded");
       } else {
         qualityFuture2 = RecieveAPI().qualityCheckValue(
-            context: context,
-            userId: widget.userId,
-            valuesId: question.ques[selectindex].value);
+            context: context, valuesId: question.ques[selectindex].value);
       }
       // if(question.ques[selectindex].value)
 
@@ -1432,8 +1430,6 @@ class _QualityContainerState extends State<QualityContainer> {
                                                             RecieveAPI().qualityCheckValue(
                                                                 context:
                                                                     context,
-                                                                userId: widget
-                                                                    .userId,
                                                                 valuesId: question
                                                                     .ques[
                                                                         selectindex]
@@ -1567,10 +1563,19 @@ class _QualityContainerState extends State<QualityContainer> {
                                                     BorderRadius.circular(10)),
                                             child: TextButton(
                                                 onPressed: () {
+                                                  print(selectindex.toString() +
+                                                      '-----selected value-----' +
+                                                      question.ques.length
+                                                          .toString());
                                                   print(
                                                       "select-->${selectindex + 1}");
-                                                  if (selectindex ==
+                                                  if (selectindex + 1 ==
                                                       question.ques.length) {
+                                                    print(question
+                                                            .ques[selectindex]
+                                                            .value
+                                                            .toString() +
+                                                        '------>>>> question ID');
                                                     print(
                                                         "question length-->${question.ques.length}");
                                                     RecieveAPI()
@@ -1589,16 +1594,23 @@ class _QualityContainerState extends State<QualityContainer> {
                                                     )
                                                         .then((value) {
                                                       chooseValue = null;
-                                                      Navigator.pushReplacement(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  OrdersLinePage1(
-                                                                      barcode:
-                                                                          widget
-                                                                              .barcode,
-                                                                      id: widget
-                                                                          .userId)));
+                                                      print(question
+                                                              .ques[selectindex]
+                                                              .value
+                                                              .toString() +
+                                                          '----->>>> question id');
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      // Navigator.pushReplacement(
+                                                      //     context,
+                                                      //     MaterialPageRoute(
+                                                      //         builder: (context) =>
+                                                      //             OrdersLinePage1(
+                                                      //                 barcode:
+                                                      //                     widget
+                                                      //                         .barcode,
+                                                      //                 id: widget
+                                                      //                     .userId)));
                                                     });
                                                   } else {
                                                     if (chooseValue == null) {
@@ -1607,7 +1619,7 @@ class _QualityContainerState extends State<QualityContainer> {
                                                               context: context,
                                                               title: 'Question',
                                                               subtitle:
-                                                                  'Please select an answer from the given Drop-down',
+                                                                  "Please select an answer from the given Drop-down",
                                                               onTapOkButt: () {
                                                                 Navigator.of(
                                                                         context)
@@ -1639,6 +1651,21 @@ class _QualityContainerState extends State<QualityContainer> {
                                                           setState(() {
                                                             selectindex += 1;
                                                           });
+                                                          print(question
+                                                                  .ques[
+                                                                      selectindex]
+                                                                  .value
+                                                                  .toString() +
+                                                              '------>>>> question ID');
+                                                          qualityFuture2 =
+                                                              RecieveAPI()
+                                                                  .qualityCheckValue(
+                                                            context: context,
+                                                            valuesId: question
+                                                                .ques[
+                                                                    selectindex]
+                                                                .value,
+                                                          );
                                                           feedbackController
                                                               .text = '';
                                                           chooseValue = null;

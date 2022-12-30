@@ -8,8 +8,10 @@ import 'package:warehouse/screens/PutAway/put_away_widget/custom_putaway_button.
 import '../../../const/color.dart';
 
 class PickProductScanWidget extends StatefulWidget {
+  final String locationDesId;
   final String productId;
-  const PickProductScanWidget({super.key, required this.productId});
+  const PickProductScanWidget(
+      {super.key, required this.locationDesId, required this.productId});
 
   @override
   State<PickProductScanWidget> createState() => _PickProductScanWidgetState();
@@ -26,9 +28,9 @@ class _PickProductScanWidgetState extends State<PickProductScanWidget> {
 
   Future<void> _getQRcode(Barcode qrCode, MobileScannerArguments? args) async {
     print(qrCode.rawValue);
-    if (qrCode.rawValue == widget.productId) {
+    if (qrCode.rawValue == widget.locationDesId) {
       productSc = qrCode.rawValue.toString();
-      await updateApi(id: qrCode.rawValue.toString());
+      await updateApi(id: widget.productId);
       setState(() {});
     }
   }
@@ -125,7 +127,7 @@ class _PickProductScanWidgetState extends State<PickProductScanWidget> {
                               fontWeight: FontWeight.bold),
                         ),
                         controller: quantityController,
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.name,
                         onSubmitted: (e) {
                           quantityController!.text = e;
                         },

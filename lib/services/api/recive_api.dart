@@ -538,9 +538,7 @@ class RecieveAPI with ChangeNotifier {
   }
 
   Future<List<QualityQuestionsValue?>> qualityCheckValue(
-      {required BuildContext context,
-      required String userId,
-      required String valuesId}) async {
+      {required BuildContext context, required String valuesId}) async {
     _isLoading = true;
 
     final user = Provider.of<UserDetails>(context, listen: false);
@@ -556,9 +554,9 @@ class RecieveAPI with ChangeNotifier {
     String clinedId = user.clientID;
 
     var url =
-        "http://eiuat.seedors.com:8290/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&id=$userId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value";
+        "http://eiuat.seedors.com:8290/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value";
     print(
-        "qustionValue Api --->http://eiuat.seedors.com:8290/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&id=$userId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value");
+        "qustionValue Api --->http://eiuat.seedors.com:8290/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value");
     try {
       https.Response response =
           await https.get(Uri.parse(url), headers: header);
@@ -630,8 +628,7 @@ class RecieveAPI with ChangeNotifier {
       statusCode = response.statusCode;
       if (response.statusCode == 200) {
         print("value-->${response.body}");
-        qualityCheckValue(
-            context: context, userId: userId, valuesId: questionId);
+
         globalSnackBar.successsnackbar(context: context, text: "Success");
       } else {
         globalSnackBar.genarelSnackbar(
