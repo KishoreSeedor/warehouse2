@@ -49,6 +49,7 @@ class PutAwayOrderLineProvid with ChangeNotifier {
       final user = Provider.of<UserDetails>(context, listen: false);
       userDetails.getAllDetails();
       List<PutawayOrderLineModel> _loaddata = [];
+      _orderlineArrangement = [];
       var headers = {
         'Cookie':
             'session_id=a92b5a9151dc99504afb48b311aadcdbde48fd28; session_id=de84b687a95814d71089cdb547af129c7ed08e41'

@@ -60,7 +60,7 @@ class PickOrderLineProvider with ChangeNotifier {
 
       http.Response response = await http.get(Uri.parse(url), headers: headers);
       var jsonData = json.decode(response.body);
-
+      _orderlineArrangement = [];
       if (response.statusCode == 200) {
         for (var i = 0; i < jsonData.length; i++) {
           String pickingPartnerId;
