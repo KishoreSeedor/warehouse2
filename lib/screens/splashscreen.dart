@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../const/color.dart';
 import '../provider/login_details.provider.dart';
 import 'home_page.dart';
-import 'login_page.dart';
+import 'login/login_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

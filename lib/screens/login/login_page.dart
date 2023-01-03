@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:warehouse/screens/login/login_api_call_warehouse.dart';
 import 'package:warehouse/services/bar_code_scaner.dart';
-import '../const/color.dart';
-import '../provider/device_info.dart';
-import '../provider/login_auth_provider.dart';
-import '../services/dialogue.dart';
+import '../../const/color.dart';
+import '../../provider/device_info.dart';
+import '../../provider/login_auth_provider.dart';
+import '../../services/dialogue.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({
@@ -37,8 +38,9 @@ class _LoginPageState extends State<LoginPage> {
   final _fromKey = GlobalKey<FormState>();
   final GlobalServices _services = GlobalServices();
 
-  void sumit() async {
-    final cricleLoading = Provider.of<AuthProvider>(context, listen: false);
+  void submit() async {
+    final cricleLoading =
+        Provider.of<LoginWareHouseCall>(context, listen: false);
     cricleLoading.isLoading
         ? showDialog(
             context: context,
@@ -64,9 +66,10 @@ class _LoginPageState extends State<LoginPage> {
           context, "Password", "Enter Valid Password");
     } else {
       _fromKey.currentState!.save();
-      await Provider.of<AuthProvider>(context, listen: false).loginApi(
-        email: _emailController.text,
-        password: _passwordController.text,
+      await Provider.of<LoginWareHouseCall>(context, listen: false)
+          .loginApiCall(
+        userEmail: _emailController.text,
+        userPassword: _passwordController.text,
         context: context,
       );
       debugPrint('loginApi');
@@ -192,7 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(20)),
                       child: ElevatedButton(
                         onPressed: () {
-                          sumit();
+                          submit();
                         },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: CustomColor.yellow,

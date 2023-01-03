@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as https;
+import 'package:warehouse/const/config.dart';
 import '../../models/orders_line_model.dart';
 import '../../models/quality_check_questions.dart';
 import '../../models/quality_value.dart';
@@ -126,10 +127,12 @@ class RecieveAPI with ChangeNotifier {
 
     String clinedId = user.clientID;
 
+    print("cId---> $clinedId");
+
     var url =
-        "http://eiuat.seedors.com:8290/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=$clinedId&domain=[('picking_state','=','1')]";
+        "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=$clinedId&domain=[('picking_state','=','1')]";
     print(
-        "first http-->http://eiuat.seedors.com:8290/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=$clinedId&domain=[('picking_state','=','1')]");
+        "first http-->$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=$clinedId&domain=[('picking_state','=','1')]");
     try {
       https.Response response =
           await https.get(Uri.parse(url), headers: headers);
@@ -221,9 +224,9 @@ class RecieveAPI with ChangeNotifier {
     String clinedId = user.clientID;
 
     var url =
-        "http://eiuat.seedors.com:8290/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','transport_date','display_name','date','partner_id','create_date','barcode',}&clientid=$clinedId&domain=[('id','=',$domain)]";
+        "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','transport_date','display_name','date','partner_id','create_date','barcode',}&clientid=$clinedId&domain=[('id','=',$domain)]";
     print(
-        "First domain-->http://eiuat.seedors.com:8290/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','transport_date','display_name','date','partner_id','create_date','barcode'}&clientid=$clinedId&domain=[('id','=',$domain)]");
+        "First domain-->$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','transport_date','display_name','date','partner_id','create_date','barcode'}&clientid=$clinedId&domain=[('id','=',$domain)]");
     try {
       var result = '';
       https.Response response =
@@ -307,10 +310,10 @@ class RecieveAPI with ChangeNotifier {
     String clainedId = user.clientID;
 
     var url =
-        "http://eiuat.seedors.com:8290/seedor-api/warehouse/received-order-line?fields={'product_id','product_uom_qty','quantity_done','picking_partner_id','display_name','picking_id','barcode','x_sku_id','x_length','x_breadth','x_height','x_dimension','x_weight'}&clientid=$clainedId&domain=[('picking_id','=',$pickingId)]";
+        "$baseApiUrl/seedor-api/warehouse/received-order-line?fields={'product_id','product_uom_qty','quantity_done','picking_partner_id','display_name','picking_id','barcode','x_sku_id','x_length','x_breadth','x_height','x_dimension','x_weight'}&clientid=$clainedId&domain=[('picking_id','=',$pickingId)]";
 
     print(
-        "order line -->http://eiuat.seedors.com:8290/seedor-api/warehouse/received-order-line?fields={'product_id','product_uom_qty','quantity_done','picking_partner_id','display_name','picking_id','barcode','x_sku_id','x_length','x_breadth','x_height','x_dimension','x_weight'}&clientid=$clainedId&domain=[('picking_id','=',$pickingId)]");
+        "order line -->$baseApiUrl/seedor-api/warehouse/received-order-line?fields={'product_id','product_uom_qty','quantity_done','picking_partner_id','display_name','picking_id','barcode','x_sku_id','x_length','x_breadth','x_height','x_dimension','x_weight'}&clientid=$clainedId&domain=[('picking_id','=',$pickingId)]");
 
     try {
       https.Response response =
@@ -419,10 +422,10 @@ class RecieveAPI with ChangeNotifier {
     String clainedId = user.clientID;
     // print("original id -->$skuId");
     var url =
-        'http://eiuat.seedors.com:8290/seedor-api/warehouse/update-recived/$id?clientid=$clainedId&quantity=$quantity&length=$length&breadth=$breadth&height=$height&weight=$weight&verified_by=$verifiedId';
+        '$baseApiUrl/seedor-api/warehouse/update-recived/$id?clientid=$clainedId&quantity=$quantity&length=$length&breadth=$breadth&height=$height&weight=$weight&verified_by=$verifiedId';
 
     print(
-        'url order line quantity -->http://eiuat.seedors.com:8290/seedor-api/warehouse/update-recived/$id?clientid=$clainedId&quantity=$quantity&length=$length&breadth=$breadth&height=$height&weight=$weight&verified_by=$verifiedId');
+        'url order line quantity -->$baseApiUrl/seedor-api/warehouse/update-recived/$id?clientid=$clainedId&quantity=$quantity&length=$length&breadth=$breadth&height=$height&weight=$weight&verified_by=$verifiedId');
 
     try {
       https.Response response =
@@ -489,9 +492,9 @@ class RecieveAPI with ChangeNotifier {
     String clinedId = user.clientID;
 
     var url =
-        "http://eiuat.seedors.com:8290/seedor-api/warehouse/quality-check/scenario?clientid=$clinedId&id=$userId&fields={'id','name','possible_ql_values'}";
+        "$baseApiUrl/seedor-api/warehouse/quality-check/scenario?clientid=$clinedId&id=$userId&fields={'id','name','possible_ql_values'}";
     print(
-        "qustion Api --->http://eiuat.seedors.com:8290/seedor-api/warehouse/quality-check/scenario?clientid=$clinedId&id=$userId&fields={'id','name','possible_ql_values'} ");
+        "qustion Api --->$baseApiUrl/seedor-api/warehouse/quality-check/scenario?clientid=$clinedId&id=$userId&fields={'id','name','possible_ql_values'} ");
     try {
       https.Response response =
           await https.get(Uri.parse(url), headers: header);
@@ -554,9 +557,9 @@ class RecieveAPI with ChangeNotifier {
     String clinedId = user.clientID;
 
     var url =
-        "http://eiuat.seedors.com:8290/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value";
+        "$baseApiUrl/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value";
     print(
-        "qustionValue Api --->http://eiuat.seedors.com:8290/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value");
+        "qustionValue Api --->$baseApiUrl/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value");
     try {
       https.Response response =
           await https.get(Uri.parse(url), headers: header);
@@ -617,9 +620,9 @@ class RecieveAPI with ChangeNotifier {
     };
 
     var url =
-        "http://eiuat.seedors.com:8290/seedor-api/warehouse/quality-check/update?question_id=$questionId&answer_id=$answerId&note=$feedBack&verified_by=${user.id}&clientid=${user.clientID}";
+        "$baseApiUrl/seedor-api/warehouse/quality-check/update?question_id=$questionId&answer_id=$answerId&note=$feedBack&verified_by=${user.id}&clientid=${user.clientID}";
     print(
-        "qualityValueGet---->http://eiuat.seedors.com:8290/seedor-api/warehouse/quality-check/update?question_id=$questionId&answer_id=$answerId&note=$feedBack&verified_by=${user.id}&clientid=${user.clientID}");
+        "qualityValueGet---->$baseApiUrl/seedor-api/warehouse/quality-check/update?question_id=$questionId&answer_id=$answerId&note=$feedBack&verified_by=${user.id}&clientid=${user.clientID}");
 
     try {
       https.Response response =
@@ -666,9 +669,9 @@ class RecieveAPI with ChangeNotifier {
             'session_id=aa66520e9df6fa47c0d7d174c2bf6d4fe3203db8; session_id=e2fc46ab8d73ddb088f3406a1ee387a52b0bcbb1'
       };
       var url =
-          "http://eiuat.seedors.com:8290/seedor-api/warehouse/move-to-putaway/$userId?clientid=${user.clientID}";
+          "$baseApiUrl/seedor-api/warehouse/move-to-putaway/$userId?clientid=${user.clientID}";
       print(
-          "valit url-->http://eiuat.seedors.com:8290/seedor-api/warehouse/move-to-putaway/$userId?clientid=${user.clientID}");
+          "valit url-->$baseApiUrl/seedor-api/warehouse/move-to-putaway/$userId?clientid=${user.clientID}");
       var response = await https.post(Uri.parse(url), headers: header);
       var jsonData = json.decode(response.body);
       print("valid response-->${response.body}");

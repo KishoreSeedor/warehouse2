@@ -6,7 +6,7 @@ import 'package:warehouse/screens/Count/Count_Ui_desgin/count_company_screen.dar
 import 'package:warehouse/screens/Count/customerCountScreen/Customercountscreen/customer_count_screen.dart';
 import 'package:warehouse/screens/Count/inventryProductScreen/inventry_order_screen.dart';
 import 'package:warehouse/screens/PickOrder/pick_model/pick_oder_model.dart';
-import 'package:warehouse/screens/login_page.dart';
+import 'package:warehouse/screens/login/login_page.dart';
 import 'package:warehouse/widgets/custom_alert_dialog.dart';
 
 import '../const/color.dart';
