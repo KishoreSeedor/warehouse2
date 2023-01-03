@@ -15,6 +15,7 @@ import 'package:warehouse/screens/PickOrder/pick_order_provider/pickorder_line_p
 import 'package:warehouse/screens/PickOrder/pick_ui_design/pick_orders_screen.dart';
 import 'package:warehouse/screens/PutAway/put_away_provider/put_away_orderline_provider.dart';
 import 'package:warehouse/screens/PutAway/put_away_provider/put_away_provider.dart';
+import 'package:warehouse/screens/login/login_api_call_warehouse.dart';
 import 'provider/device_info.dart';
 import 'provider/login_auth_provider.dart';
 import 'provider/login_details.provider.dart';
@@ -63,7 +64,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: CustomerCountProvider()),
         ChangeNotifierProvider.value(value: CustomerCountOrderProvider()),
         ChangeNotifierProvider.value(value: OrderLineProdProvider()),
-        ChangeNotifierProvider.value(value: InventryProductProvider()),
+        ChangeNotifierProvider.value(
+          value: InventryProductProvider(),
+        ),
+        ChangeNotifierProvider.value(value: LoginWareHouseCall())
       ],
       child: MaterialApp(
         title: 'Warehouse',

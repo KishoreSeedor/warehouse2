@@ -134,7 +134,7 @@ class AuthProvider with ChangeNotifier {
         prefs.setString('planname', jsonData['planname'].toString());
         prefs.setString('clientid', jsonData['clientid'].toString());
         prefs.setString('seedorname', jsonData['seedorname'].toString());
-
+        print("claind--->${jsonData['clientid'].toString()}");
         // ignore: use_build_context_synchronously
         Navigator.pushAndRemoveUntil(
             context,

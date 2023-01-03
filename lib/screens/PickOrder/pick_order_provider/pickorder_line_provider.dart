@@ -209,6 +209,7 @@ class PickOrderLineProvider with ChangeNotifier {
       required String id,
       required String locationid}) async {
     try {
+      userDetails.getAllDetails();
       var headers = {
         'Cookie':
             'session_id=a92b5a9151dc99504afb48b311aadcdbde48fd28; session_id=e2fc46ab8d73ddb088f3406a1ee387a52b0bcbb1'
@@ -216,10 +217,10 @@ class PickOrderLineProvider with ChangeNotifier {
 
       var response = await http.put(
           Uri.parse(
-              'http://eiuat.seedors.com:8290/seedor-api/warehouse/rearrange-bin/$id?clientid=seedorwarehouseuat&verified_by=2&location_id=8'),
+              '$baseApiUrl/seedor-api/warehouse/rearrange-bin/$id?clientid=${userDetails.clientID}&verified_by=2&location_id=8'),
           headers: headers);
       print(
-          'http://eiuat.seedors.com:8290/seedor-api/warehouse/rearrange-bin/$id?clientid=seedorwarehouseuat&verified_by=2&location_id=8');
+          '$baseApiUrl/seedor-api/warehouse/rearrange-bin/$id?clientid=${userDetails.clientID}&verified_by=2&location_id=8');
       if (response.statusCode == 200) {
         showSnackBar(context: context, title: 'Successfully Updated');
         Navigator.of(context).pop();

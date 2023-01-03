@@ -109,7 +109,7 @@ class _PutAwayOrdersScreenState extends State<PutAwayOrdersScreen> {
                 ? ErrorScreenPutAway(title: data.orderlIneErrorMessage)
                 : data.putAwayOrderLine.isEmpty
                     ? EmptyScreenPutAway(
-                        title: 'No Products avalible',
+                        title: 'No Products available',
                       )
                     : ListView.separated(
                         keyboardDismissBehavior:

@@ -3,9 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:warehouse/const/config.dart';
+import 'package:warehouse/provider/login_details.provider.dart';
 import 'package:warehouse/screens/Count/Count_model/orderline_prod_model.dart';
 
 class OrderLineProdProvider with ChangeNotifier {
+  UserDetails userDetails = UserDetails();
   bool _orderlineProdLoading = false;
   bool get orderlineProdLoading {
     return _orderlineProdLoading;
@@ -29,6 +32,7 @@ class OrderLineProdProvider with ChangeNotifier {
   Future<dynamic> getOrderlineProdApi({required String id}) async {
     try {
       _orderlineProdLoading = true;
+
       List<OrderLineProdModel> _loadData = [];
       var headers = {
         'Cookie':
@@ -37,10 +41,10 @@ class OrderLineProdProvider with ChangeNotifier {
 
       var response = await http.get(
           Uri.parse(
-              "http://eiuat.seedors.com:8290/seedor-api/warehouse/order-line/list?clientid=seedorwarehouseuat&domain=[('picking_id','=',$id)]"),
+              "$baseApiUrl/seedor-api/warehouse/order-line/list?clientid=${userDetails.clientID}&domain=[('picking_id','=',$id)]"),
           headers: headers);
       print(
-          "http://eiuat.seedors.com:8290/seedor-api/warehouse/order-line/list?clientid=seedorwarehouseuat&domain=[('picking_id','=',$id)]");
+          "$baseApiUrl/seedor-api/warehouse/order-line/list?clientid=${userDetails.clientID}&domain=[('picking_id','=',$id)]");
       var jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
         for (var i = 0; i < jsonData.length; i++) {
@@ -122,6 +126,7 @@ class OrderLineProdProvider with ChangeNotifier {
   Future<dynamic> getOrderlineProdDetailsApi({required String id}) async {
     try {
       _orderlineProdLoading = true;
+      await userDetails.getAllDetails();
       List<OrderLineProdModel> _loadData = [];
       var headers = {
         'Cookie':
@@ -130,10 +135,10 @@ class OrderLineProdProvider with ChangeNotifier {
 
       var response = await http.get(
           Uri.parse(
-              "http://eiuat.seedors.com:8290/seedor-api/warehouse/order-line/list?clientid=seedorwarehouseuat&domain=[('picking_id','=',$id)]"),
+              "$baseApiUrl/seedor-api/warehouse/order-line/list?clientid=${userDetails.clientID}&domain=[('picking_id','=',$id)]"),
           headers: headers);
       print(
-          "http://eiuat.seedors.com:8290/seedor-api/warehouse/order-line/list?clientid=seedorwarehouseuat&domain=[('picking_id','=',$id)]");
+          "$baseApiUrl/seedor-api/warehouse/order-line/list?clientid=${userDetails.clientID}&domain=[('picking_id','=',$id)]");
       var jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
         for (var i = 0; i < jsonData.length; i++) {

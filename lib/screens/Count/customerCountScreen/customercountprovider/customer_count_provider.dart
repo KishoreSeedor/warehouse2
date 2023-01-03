@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:warehouse/const/config.dart';
+import 'package:warehouse/provider/login_details.provider.dart';
 import 'package:warehouse/screens/Count/Count_model/count_customer_model.dart';
 import 'package:warehouse/screens/Count/Count_model/count_total_id.dart';
 import 'package:warehouse/widgets/custom_alert_dialog.dart';
 import 'package:http/http.dart' as http;
 
 class CustomerCountProvider with ChangeNotifier {
+  UserDetails userDetails = UserDetails();
   List<CountCustomerModel> _allCustomerdata = [];
   List<CountCustomerModel> get allCustomerData {
     return _allCustomerdata;
@@ -43,6 +46,7 @@ class CustomerCountProvider with ChangeNotifier {
   Future<dynamic> getAllCustomerApi({required BuildContext context}) async {
     _customerLoading = true;
     try {
+      await userDetails.getAllDetails();
       List<CountCustomerModel> _loadData = [];
       var headers = {
         'Cookie':
@@ -50,7 +54,7 @@ class CustomerCountProvider with ChangeNotifier {
       };
       var response = await http.get(
           Uri.parse(
-              "http://eiuat.seedors.com:8290/seedor-api/warehouse/customer/list?clientid=seedorwarehouseuat&fields={'id','name'}"),
+              "$baseApiUrl/seedor-api/warehouse/customer/list?clientid=${userDetails.clientID}&fields={'id','name'}"),
           headers: headers);
       print(response.statusCode);
 
@@ -137,6 +141,7 @@ class CustomerCountProvider with ChangeNotifier {
       required String apiName,
       required String id}) async {
     try {
+      await userDetails.getAllDetails();
       _countLoading = true;
       var headers = {
         'Authorization': 'Bearer ocUHVoyTnMks1CmUFLLEqT4qNrUG7n',
@@ -150,10 +155,10 @@ class CustomerCountProvider with ChangeNotifier {
       }
       var response = await http.get(
           Uri.parse(
-              "http://eiuat.seedors.com:8290/seedor-api/warehouse/$apiName/count?fields={'cnt_asn','cnt_grn','cnt_del','cnt_stock'}&clientid=seedorwarehouseuat$domain"),
+              "$baseApiUrl/seedor-api/warehouse/$apiName/count?fields={'cnt_asn','cnt_grn','cnt_del','cnt_stock'}&clientid=${userDetails.clientID}$domain"),
           headers: headers);
       print(
-          "http://eiuat.seedors.com:8290/seedor-api/warehouse/$apiName/count?fields={'cnt_asn','cnt_grn','cnt_del','cnt_stock'}&clientid=seedorwarehouseuat$domain");
+          "$baseApiUrl/seedor-api/warehouse/$apiName/count?fields={'cnt_asn','cnt_grn','cnt_del','cnt_stock'}&clientid=${userDetails.clientID}$domain");
       print(response.body);
       var jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -246,17 +251,18 @@ class CustomerCountProvider with ChangeNotifier {
   Future<dynamic> inventryProductgetApi({required BuildContext context}) async {
     _customerLoading = true;
     try {
+      await userDetails.getAllDetails();
       List<CountCustomerModel> _loadData = [];
       var headers = {
         'Cookie':
             'session_id=9e669fcd0cf6534de56902a8eea6f1affce671ef; session_id=e2fc46ab8d73ddb088f3406a1ee387a52b0bcbb1'
       };
       print(
-          "http://eiuat.seedors.com:8290/seedor-api/warehouse/inventory/list?clientid=seedorwarehouseuat&domain=['&',('state','!=','done'),('state','!=','cancel')]");
+          "$baseApiUrl/seedor-api/warehouse/inventory/list?clientid=${userDetails.clientID}&domain=['&',('state','!=','done'),('state','!=','cancel')]");
 
       var response = await http.get(
         Uri.parse(
-            "http://eiuat.seedors.com:8290/seedor-api/warehouse/inventory/list?clientid=seedorwarehouseuat&domain=['%26',('state','!=','done'),('state','!=','cancel')]"),
+            "$baseApiUrl/seedor-api/warehouse/inventory/list?clientid=${userDetails.clientID}&domain=['%26',('state','!=','done'),('state','!=','cancel')]"),
       );
       print(response.statusCode);
 

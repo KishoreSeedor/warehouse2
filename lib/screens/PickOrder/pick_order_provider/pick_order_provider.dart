@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as https;
 import 'package:provider/provider.dart';
+import 'package:warehouse/const/config.dart';
 import 'package:warehouse/provider/login_details.provider.dart';
 import 'package:warehouse/screens/PickOrder/pick_model/pick_order_lines_model.dart';
 
@@ -52,11 +53,11 @@ class PickOrderProvider with ChangeNotifier {
       };
 
       var url =
-          "http://eiuat.seedors.com:8290/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','3')]";
+          "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','3')]";
       // &domain=[('custom_stage_id','=','Bin Allocation')]--->Add end late when values are confirmed
       var response = await https.get(Uri.parse(url), headers: headers);
       print(
-          "pickOrderUrl--->http://eiuat.seedors.com:8290/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}");
+          "pickOrderUrl--->$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','3')]");
       var jsonData = json.decode(response.body);
 
       if (response.statusCode == 200) {

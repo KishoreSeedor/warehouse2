@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:warehouse/const/config.dart';
+import 'package:warehouse/provider/login_details.provider.dart';
 import 'package:warehouse/screens/Count/Count_model/customer_count_orderprod_model.dart';
 import 'package:http/http.dart' as http;
 
 class CustomerCountOrderProvider with ChangeNotifier {
+  UserDetails userDetails = UserDetails();
   List<CustomerCountOrderProd> _allCustomerProdList = [];
   List<CustomerCountOrderProd> get allCustomerProdList {
     return _allCustomerProdList;
@@ -29,6 +32,7 @@ class CustomerCountOrderProvider with ChangeNotifier {
   Future<dynamic> getCustomerProdListApi({required String id}) async {
     try {
       _customerProdLoading = true;
+
       List<CustomerCountOrderProd> _loaddata = [];
       var headers = {
         'Cookie':
@@ -37,10 +41,10 @@ class CustomerCountOrderProvider with ChangeNotifier {
 
       var response = await http.get(
           Uri.parse(
-              "http://eiuat.seedors.com:8290/seedor-api/warehouse/order/list?clientid=seedorwarehouseuat&domain=[('partner_id','=',$id)]&fields={'id','display_name','company_id','move_line_ids'}"),
+              "$baseApiUrl/seedor-api/warehouse/order/list?clientid=${userDetails.clientID}&domain=[('partner_id','=',$id)]&fields={'id','display_name','company_id','move_line_ids'}"),
           headers: headers);
       print(
-          "http://eiuat.seedors.com:8290/seedor-api/warehouse/order/list?clientid=seedorwarehouseuat&domain=[('partner_id','=',$id)]&fields={'id','display_name','company_id','move_line_ids'}");
+          "$baseApiUrl/seedor-api/warehouse/order/list?clientid=${userDetails.clientID}&domain=[('partner_id','=',$id)]&fields={'id','display_name','company_id','move_line_ids'}");
       var jsonData = json.decode(response.body);
       print(response.statusCode);
       if (response.statusCode == 200) {
