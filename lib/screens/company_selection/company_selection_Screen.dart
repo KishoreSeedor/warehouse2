@@ -101,7 +101,7 @@ class _LoginCompanySelectionState extends State<LoginCompanySelection> {
                   for (var i = 0; i < widget.companyNames.length; i++) {
                     if (selectedIndex == i) {
                       company = LoginCompanyModel(
-                          clientid: widget.companyNames[i].clientid,
+                          clientID: widget.companyNames[i].clientID,
                           seedortype: widget.companyNames[i].seedortype,
                           companyName: widget.companyNames[i].companyName,
                           planname: widget.companyNames[i].planname);
@@ -109,7 +109,7 @@ class _LoginCompanySelectionState extends State<LoginCompanySelection> {
                           .getProfileDetails(
                               context: context,
                               userEmail: widget.userName,
-                              clientId: widget.companyNames[i].clientid,
+                              clientId: widget.companyNames[i].clientID,
                               seedorType: widget.companyNames[i].seedortype)
                           .then((value) async {
                         // print(value + 'hello hello');
