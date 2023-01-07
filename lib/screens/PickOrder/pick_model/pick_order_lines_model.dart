@@ -7,6 +7,7 @@ class PickLinesModel with ChangeNotifier {
   final String productname;
   final String quantity;
   final String productId;
+  final String skuId;
 
   PickLinesModel(
       {required this.id,
@@ -14,5 +15,7 @@ class PickLinesModel with ChangeNotifier {
       required this.productname,
       required this.quantity,
       required this.locationDestinationName,
-      required this.productId});
+      required this.productId,
+      required this.skuId,
+      });
 }

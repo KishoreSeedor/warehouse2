@@ -53,11 +53,11 @@ class PickOrderProvider with ChangeNotifier {
       };
 
       var url =
-          "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','3')]";
+          "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'x_clientno','id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','3')]";
       // &domain=[('custom_stage_id','=','Bin Allocation')]--->Add end late when values are confirmed
       var response = await https.get(Uri.parse(url), headers: headers);
       print(
-          "pickOrderUrl--->$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','3')]");
+          "pickOrderUrl--->$baseApiUrl/seedor-api/warehouse/received-orders?fields={'x_clientno','id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','3')]");
       var jsonData = json.decode(response.body);
 
       if (response.statusCode == 200) {
@@ -84,7 +84,7 @@ class PickOrderProvider with ChangeNotifier {
             date: jsonData[i]["date"].toString(),
             displayName: jsonData[i]["display_name"].toString(),
             id: jsonData[i]["id"].toString(),
-            origin: jsonData[i]["origin"].toString(),
+            origin: jsonData[i]["x_clientno"].toString(),
             partnerId: partnerId,
             companyName: companyName,
             scheduledDate: jsonData[i]["scheduled_date"].toString(),

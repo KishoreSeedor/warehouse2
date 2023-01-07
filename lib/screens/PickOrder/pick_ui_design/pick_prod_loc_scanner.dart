@@ -42,6 +42,7 @@ class _PickProdLocationScannerState extends State<PickProdLocationScanner> {
     }
 
     if (locationDestination == '') {
+      cameraController.stop();
       if (qrCode.rawValue.toString() == widget.locationId.toString()) {
         locationDestination = qrCode.rawValue.toString();
         await productGet(location: qrCode.rawValue.toString());
@@ -53,15 +54,19 @@ class _PickProdLocationScannerState extends State<PickProdLocationScanner> {
         // setState(() {
         //   print(locationDestination);
         // });
+        await cameraController.stop();
         MyCustomAlertDialog().showCustomAlertdialog(
             context: context,
             title: 'Note',
             subtitle:
                 'Scanned location is wrong.Please scan correct Location ${widget.locationId}',
-            onTapOkButt: () {
+            onTapOkButt: ()async {
+               await cameraController.stop();
               Navigator.of(context).pop();
+               Navigator.of(context).pop();
+             
             });
-        cameraController.start();
+       
       }
     }
   }
@@ -188,6 +193,7 @@ class _PickProdLocationScannerState extends State<PickProdLocationScanner> {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (ctx) => PickProductScanWidget(
                                           productId: listOfProduct[index].id,
+                                          skuId: listOfProduct[index].skuId,
                                           locationDesId:
                                               listOfProduct[index].locationDest,
                                         )));

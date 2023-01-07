@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:warehouse/provider/login_details.provider.dart';
 import 'package:warehouse/screens/login/login_api_call_warehouse.dart';
 import 'package:warehouse/services/bar_code_scaner.dart';
 import '../../const/color.dart';
@@ -72,13 +73,12 @@ class _LoginPageState extends State<LoginPage> {
         userPassword: _passwordController.text,
         context: context,
       );
-      debugPrint('loginApi');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final loading = Provider.of<AuthProvider>(context);
+    final loading = Provider.of<LoginWareHouseCall>(context);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return SafeArea(
@@ -195,7 +195,10 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(20)),
                       child: ElevatedButton(
                         onPressed: () {
-                          submit();
+                          if (loading.isLoading) {
+                          } else {
+                            submit();
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: CustomColor.yellow,

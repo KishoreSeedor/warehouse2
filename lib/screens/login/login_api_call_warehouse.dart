@@ -31,12 +31,14 @@ class LoginWareHouseCall with ChangeNotifier {
       required String userPassword}) async {
     try {
       _isLoading = true;
+      notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       var headers = {
         'Content-Type': 'application/json',
       };
       var body = json.encode({"username": userEmail, "password": userPassword});
       print(body);
+      print(allApiCallsName.loginApiCallName);
       var response = await http.post(
           UriConverter(allApiCallsName.loginApiCallName),
           body: body,
@@ -45,6 +47,9 @@ class LoginWareHouseCall with ChangeNotifier {
       var jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
         print(response.statusCode);
+        print(allApiCallsName.loginApiCallName);
+        print(response.statusCode);
+        print(jsonData['companies'].length);
         // Here we are adding all Company from login api response
         for (var i = 0; i < jsonData['companies'].length; i++) {
           _listOfLoginCompany.add(LoginCompanyModel(
@@ -53,6 +58,7 @@ class LoginWareHouseCall with ChangeNotifier {
               companyName: jsonData['companies'][i]['company_name'].toString(),
               planname: jsonData['companies'][i]['planname'].toString()));
         }
+
         if (_listOfLoginCompany.length == 1) {
           getProfileDetails(
                   context: context,
@@ -161,6 +167,7 @@ class LoginWareHouseCall with ChangeNotifier {
                       companyNames: _listOfLoginCompany,
                       userName: userEmail)),
               (route) => false);
+          _isLoading = false;
         }
       } else {
         alertDialog.showCustomAlertdialog(
@@ -172,6 +179,7 @@ class LoginWareHouseCall with ChangeNotifier {
           },
         );
         _isLoading = false;
+        notifyListeners();
       }
     } on SocketException catch (e) {
       alertDialog.showCustomAlertdialog(
@@ -217,19 +225,18 @@ class LoginWareHouseCall with ChangeNotifier {
       );
       _isLoading = false;
       notifyListeners();
+    } catch (e) {
+      alertDialog.showCustomAlertdialog(
+        context: context,
+        title: 'Sorry',
+        subtitle: e.toString(),
+        onTapOkButt: () {
+          Navigator.of(context).pop();
+        },
+      );
+      _isLoading = false;
+      notifyListeners();
     }
-    //  catch (e) {
-    //   alertDialog.showCustomAlertdialog(
-    //     context: context,
-    //     title: 'Sorry',
-    //     subtitle: e.toString(),
-    //     onTapOkButt: () {
-    //       Navigator.of(context).pop();
-    //     },
-    //   );
-    //   _isLoading = false;
-    //   notifyListeners();
-    // }
   }
 
   // PROFILE GET API //
@@ -257,6 +264,9 @@ class LoginWareHouseCall with ChangeNotifier {
           body: body);
       statusCode = response.statusCode;
       jsonData = json.decode(response.body);
+      print(allApiCallsName.loginProfileGetApiName);
+      print(jsonData);
+      print(body);
       if (response.statusCode == 200) {
         return [response.statusCode, jsonData];
       } else {
