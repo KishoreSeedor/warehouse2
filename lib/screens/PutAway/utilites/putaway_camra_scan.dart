@@ -36,23 +36,21 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
     if (locationDestination.substring(0, 3).toLowerCase().toString() == 'loc') {
       print('entering locating scan');
 
-      if (id.substring(0, 3).toLowerCase().toString() == 'sku') {
-        print('entering product scan');
-        for (var i = 0; i < data.allOrderLineProd.length; i++) {
-          if (data.allOrderLineProd[i].skuId == id) {
-            putAwayOrdersModel = data.allOrderLineProd[i];
-            setState(() {});
-            break;
-          }
+      print('entering product scan');
+      for (var i = 0; i < data.allOrderLineProd.length; i++) {
+        if (data.allOrderLineProd[i].skuId == id) {
+          putAwayOrdersModel = data.allOrderLineProd[i];
+          setState(() {});
+          break;
         }
-        if (putAwayOrdersModel.locationBarcode != null ||
-            putAwayOrdersModel.locationBarcode != '') {
-          print('null check operator is working');
-          if (locationDestination == putAwayOrdersModel.locationBarcode) {
-            await data.correctproductUpdateInpallet(
-                context: context, id: putAwayOrdersModel.id);
-          }
-        } else {
+      }
+      if (putAwayOrdersModel.locationBarcode != null ||
+          putAwayOrdersModel.locationBarcode != '') {
+        print('null check operator is working');
+        if (locationDestination == putAwayOrdersModel.locationBarcode) {
+          await data.correctproductUpdateInpallet(
+              context: context, id: putAwayOrdersModel.id);
+        }else{
           print('null check operator is working as empty');
           MyCustomAlertDialog().showCustomAlertdialog(
               context: context,
@@ -69,20 +67,23 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
               });
         }
       } else {
-        MyCustomAlertDialog().showCustomAlertdialog(
-            context: context,
-            title: 'Note',
-            button: true,
-            onTapCancelButt: () {
-              Navigator.of(context).pop();
-            },
-            subtitle: 'Please scan the correct product',
-            onTapOkButt: () {
-              Navigator.of(context).pop();
-              // data.wrongproductUpdateInPallet(
-              //     context: context, id: id, locationId: locationDestination);
-            });
+       
       }
+      // } else {
+      //   MyCustomAlertDialog().showCustomAlertdialog(
+      //       context: context,
+      //       title: 'Note',
+      //       button: true,
+      //       onTapCancelButt: () {
+      //         Navigator.of(context).pop();
+      //       },
+      //       subtitle: 'Please scan the correct product',
+      //       onTapOkButt: () {
+      //         Navigator.of(context).pop();
+      //         // data.wrongproductUpdateInPallet(
+      //         //     context: context, id: id, locationId: locationDestination);
+      //       });
+      // }
 
       print('------CORRECT LOCATION---');
     } else {
@@ -108,8 +109,9 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
             Navigator.of(context).pop();
           },
           subtitle: 'Please scan the correct location',
-          onTapOkButt: () {
+          onTapOkButt: () async {
             Navigator.of(context).pop();
+            await cameraController.start();
             // data.wrongproductUpdateInPallet(
             //     context: context, id: id, locationId: locationDestination);
           });
@@ -118,16 +120,18 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
 
   int quantity = 0;
   Future<void> _getQRcode(Barcode qrCode, MobileScannerArguments? args) async {
-    print(qrCode.rawValue);
+    print(qrCode.rawValue.toString() + '----->> QR CODE--->>');
 
     if (locationDestination != '') {
+      print('-----....----');
       await cameraController.stop();
 
       await productUpdate(id: qrCode.rawValue.toString());
     }
 
     if (locationDestination == '' &&
-        qrCode.rawValue.toString().substring(0, 3).toString() == 'loc') {
+        qrCode.rawValue.toString().toLowerCase().substring(0, 3).toString() == 'loc') {
+      print('----->> LOC LOC--->>');
       await cameraController.stop();
       locationDestination = qrCode.rawValue.toString();
       setState(() {

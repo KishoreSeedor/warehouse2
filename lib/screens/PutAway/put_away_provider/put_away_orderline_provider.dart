@@ -57,7 +57,7 @@ class PutAwayOrderLineProvid with ChangeNotifier {
 
       var response = await http.get(
           Uri.parse(
-              "$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${user.clientID}&domain=[('putaway_upadted','!=',True),('picking_id','=',$id)]"),
+              "$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${user.clientID}&fields={'id','location_barcode','location_dest_id','product_id','product_qty','x_sku_line_id'}&domain=[('putaway_upadted','!=',True),('picking_id','=',$id)]"),
           headers: headers);
       print(
           "$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${user.clientID}&domain=[('putaway_upadted','!=',True),('picking_id','=',$id)]");
@@ -78,7 +78,7 @@ class PutAwayOrderLineProvid with ChangeNotifier {
             productname: jsonData[i]['product_id'][1].toString(),
             quantity: jsonData[i]['product_qty'].toString(),
             productId: jsonData[i]['product_id'][0].toString(),
-            skuId: jsonData[i]['x_sku_id'][1].toString(),
+            skuId: jsonData[i]['x_sku_line_id'].toString(),
           ));
         }
 

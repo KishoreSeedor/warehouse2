@@ -4,14 +4,19 @@ import 'package:provider/provider.dart';
 import 'package:warehouse/screens/PickOrder/pick_order_provider/pickorder_line_provider.dart';
 import 'package:warehouse/screens/PutAway/put_away_widget/custom_appbar_putAway.dart';
 import 'package:warehouse/screens/PutAway/put_away_widget/custom_putaway_button.dart';
+import 'package:warehouse/widgets/custom_alert_dialog.dart';
 
 import '../../../const/color.dart';
 
 class PickProductScanWidget extends StatefulWidget {
   final String locationDesId;
   final String productId;
+  final String skuId;
   const PickProductScanWidget(
-      {super.key, required this.locationDesId, required this.productId});
+      {super.key,
+      required this.locationDesId,
+      required this.productId,
+      required this.skuId});
 
   @override
   State<PickProductScanWidget> createState() => _PickProductScanWidgetState();
@@ -28,16 +33,31 @@ class _PickProductScanWidgetState extends State<PickProductScanWidget> {
 
   Future<void> _getQRcode(Barcode qrCode, MobileScannerArguments? args) async {
     print(qrCode.rawValue);
-    if (qrCode.rawValue == widget.locationDesId) {
+    if (qrCode.rawValue == widget.skuId) {
       productSc = qrCode.rawValue.toString();
       await updateApi(id: widget.productId);
-      setState(() {});
+      setState(() {
+        Navigator.of(context).pop();
+      });
+    } else {
+      await cameraController.stop();
+      MyCustomAlertDialog().showCustomAlertdialog(
+          context: context,
+          title: 'Note',
+          subtitle:
+              'You are scanning wrong product please scan correct product',
+          onTapOkButt: () async {
+            await cameraController.stop();
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          });
     }
   }
 
   TextEditingController? quantityController;
   @override
   Widget build(BuildContext context) {
+    print(widget.productId + '------->>>>> id');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: CustomColor.yellow,

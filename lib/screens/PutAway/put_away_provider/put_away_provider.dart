@@ -6,11 +6,13 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:warehouse/const/config.dart';
 import 'package:warehouse/screens/PutAway/put_away_model/put_away_orderline_model.dart';
+import 'package:warehouse/screens/PutAway/utilites/putaway_snackbar.dart';
 
 import '../../../provider/login_details.provider.dart';
 
 class PutAwayProvider with ChangeNotifier {
   List<PutAwayOrdersModel> _putAwayOrderLine = [];
+  UserDetails userDetails = UserDetails();
 
   List<PutAwayOrdersModel> get putAwayOrderLine {
     return _putAwayOrderLine;
@@ -45,10 +47,10 @@ class PutAwayProvider with ChangeNotifier {
 
       var response = await http.get(
           Uri.parse(
-              "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','2')]"),
+              "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=['%26',('picking_state','=','2'),('state','!=','done')]"),
           headers: headers);
       print(
-          "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=[('picking_state','=','2')]");
+          "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=['%26',('picking_state','=','2'),('state','!=','done')]");
       var jsonData = json.decode(response.body);
       // print(jsonData['location_barcode'].toString());
       if (response.statusCode == 200) {
@@ -124,6 +126,34 @@ class PutAwayProvider with ChangeNotifier {
       _orderlIneErrorMessage = "Some thing went wtong";
       notifyListeners();
       return [400, _putAwayOrderLine];
+    }
+  }
+
+  Future<dynamic> validateApi(
+      {required BuildContext context, required String lineId}) async {
+    try {
+      await userDetails.getAllDetails();
+      var headers = {
+        'Cookie':
+            'session_id=e225a41ff7edb32f8369305a02696814d78d3b90; session_id=971caadaba128adf8659d76b6b89c163b723df68'
+      };
+      var response = await http.post(
+          Uri.parse(
+              "$baseApiUrl/seedor-api/warehouse/move-to-done/$lineId?clientid=${userDetails.clientID}"),
+          headers: headers);
+      print(
+          "$baseApiUrl/seedor-api/warehouse/move-to-done/$lineId?clientid=${userDetails.clientID}");
+      var jsondata = json.decode(response.body);
+      if (response.statusCode == 200) {
+        Navigator.of(context).pop();
+        showSnackBar(context: context, title: 'Successfully Updated');
+      } else {
+        showSnackBar(
+            context: context,
+            title: jsondata['Details'] ?? 'Something went wrong');
+      }
+    } catch (e) {
+      showSnackBar(context: context, title: 'Something went wrong in validate');
     }
   }
 }

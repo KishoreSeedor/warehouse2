@@ -78,10 +78,11 @@ class PickOrderLineProvider with ChangeNotifier {
             id: jsonData[i]['id'].toString(),
             locationDest: jsonData[i]['location_barcode'].toString(),
             locationDestinationName:
-                jsonData[i]['location_dest_id'][1].toString(),
+                jsonData[i]['location_id'][1].toString(),
             productId: jsonData[i]['product_id'][0].toString(),
             productname: jsonData[i]['product_id'][1].toString(),
             quantity: jsonData[i]['product_qty'].toString(),
+            skuId: jsonData[i]['x_sku_line_id'].toString(),
             //             .floor()
             //             .toString(),
           ));
