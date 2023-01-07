@@ -48,7 +48,7 @@ class LoginWareHouseCall with ChangeNotifier {
         // Here we are adding all Company from login api response
         for (var i = 0; i < jsonData['companies'].length; i++) {
           _listOfLoginCompany.add(LoginCompanyModel(
-              clientid: jsonData['companies'][i]['clientid'].toString(),
+              clientID: jsonData['companies'][i]['clientid'].toString(),
               seedortype: jsonData['companies'][i]['seedortype'].toString(),
               companyName: jsonData['companies'][i]['company_name'].toString(),
               planname: jsonData['companies'][i]['planname'].toString()));
@@ -135,7 +135,7 @@ class LoginWareHouseCall with ChangeNotifier {
 
                   // jsonToken: rememberMe ? jsonData['token'].toString() : '',
 
-                  clientID: value[1]['profile'][0]['clientid'].toString(),
+                  clientID: value[1]['clientid'].toString(),
 
                   // planName: value[1]['planname'].toString(),
 
