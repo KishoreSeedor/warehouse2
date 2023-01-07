@@ -61,6 +61,7 @@ class LoginWareHouseCall with ChangeNotifier {
                   seedorType: jsonData['companies'][0]['seedortype'])
               .then((value) {
             if (value[0] == 200) {
+              print(value[1]['clientid'].toString() + '0000');
               var role = value[1]['roles'];
 
               for (var sus in role) {
