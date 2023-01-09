@@ -157,11 +157,14 @@ class PutAwayOrderLineProvid with ChangeNotifier {
       await userDetails.getAllDetails();
       var response = await http.put(
           Uri.parse(
-              '$baseApiUrl/seedor-api/warehouse/complete-put-away/$id?clientid=${userDetails.clientID}&verified_by=2'),
+              '$baseApiUrl/seedor-api/warehouse/complete-put-away/$id?clientid=${userDetails.clientID}&verified_by=${userDetails.id}'),
           headers: headers);
-
+      print(
+          "$baseApiUrl/seedor-api/warehouse/complete-put-away/$id?clientid=${userDetails.clientID}&verified_by=${userDetails.id}");
       if (response.statusCode == 200) {
+        await getAllorderLineProduct(context: context, id: id);
         showSnackBar(context: context, title: 'Successfully updated');
+        Navigator.of(context).pop();
       } else {
         customAlertDialog.showCustomAlertdialog(
             context: context,
@@ -223,12 +226,14 @@ class PutAwayOrderLineProvid with ChangeNotifier {
 
       var response = await http.put(
           Uri.parse(
-              '$baseApiUrl/seedor-api/warehouse/rearrange-bin/$id?clientid=${userDetails.clientID}&verified_by=2&location_id=$locationId'),
+              '$baseApiUrl/seedor-api/warehouse/rearrange-bin/$id?clientid=${userDetails.clientID}&verified_by=${userDetails.id}&location_id=$locationId'),
           headers: headers);
       print(
-          '$baseApiUrl/seedor-api/warehouse/rearrange-bin/$id?clientid=${userDetails.clientID}&verified_by=2&location_id=$locationId');
+          '$baseApiUrl/seedor-api/warehouse/rearrange-bin/$id?clientid=${userDetails.clientID}&verified_by=${userDetails.id}&location_id=$locationId');
       if (response.statusCode == 200) {
+        await getAllorderLineProduct(context: context, id: id);
         showSnackBar(context: context, title: 'Successfully updated');
+
         Navigator.of(context).pop();
       } else {
         customAlertDialog.showCustomAlertdialog(
@@ -275,6 +280,58 @@ class PutAwayOrderLineProvid with ChangeNotifier {
           });
 
       notifyListeners();
+    }
+  }
+
+  Future<dynamic> getBarcodeWithProduct() async {
+    try {} catch (e) {
+      print(e);
+    }
+  }
+
+  Future<dynamic> checkLocationApi(
+      {required String locationId, required BuildContext context}) async {
+    int statusCode = 0;
+    try {
+      userDetails.getAllDetails();
+      var headers = {
+        'Cookie':
+            'session_id=9e669fcd0cf6534de56902a8eea6f1affce671ef; session_id=e2fc46ab8d73ddb088f3406a1ee387a52b0bcbb1; session_id=e225a41ff7edb32f8369305a02696814d78d3b90; session_id=971caadaba128adf8659d76b6b89c163b723df68'
+      };
+      var response = await http.get(
+          Uri.parse(
+              "$baseApiUrl/seedor-api/warehouse/location/list?clientid=${userDetails.clientID}&domain=[('barcode','=','$locationId')]&fields={'barcode'}"),
+          headers: headers);
+
+      print(
+          "$baseApiUrl/seedor-api/warehouse/location/list?clientid=${userDetails.clientID}&domain=[('barcode','=','$locationId')]&fields={'barcode'}");
+      var jsondata = json.decode(response.body);
+      statusCode = response.statusCode;
+      if (response.statusCode == 200) {
+        if (jsondata.isEmpty) {
+          return [205, 'nothing'];
+        } else {
+          return [response.statusCode, jsondata];
+        }
+      } else {
+        MyCustomAlertDialog().showCustomAlertdialog(
+            context: context,
+            title: 'Sorry',
+            subtitle: jsondata['Details'] ?? 'Something went wrong',
+            onTapOkButt: () {
+              Navigator.of(context).pop();
+            });
+        return [205, 'nothing'];
+      }
+    } catch (e) {
+      MyCustomAlertDialog().showCustomAlertdialog(
+          context: context,
+          title: 'Sorry',
+          subtitle: 'Something went wrong',
+          onTapOkButt: () {
+            Navigator.of(context).pop();
+          });
+      return [205, 'nothing'];
     }
   }
 }

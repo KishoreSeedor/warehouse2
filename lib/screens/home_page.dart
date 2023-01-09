@@ -27,11 +27,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   DateTime timePressedBack = DateTime.now();
-
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    UserDetails().getAllDetails();
+  }
+  UserDetails userDetails = UserDetails();
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserDetails>(context, listen: false);
-
+   
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return WillPopScope(
@@ -114,8 +120,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.black, width: 3),
-                            image: const DecorationImage(
-                                image: AssetImage('assets/images/DP.png'),
+                            image:  DecorationImage(
+                                image: MemoryImage(user.imageUrl!),
                                 fit: BoxFit.fill),
                           ),
                         ),
@@ -139,27 +145,27 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: CustomColor.homepageBgColor,
                                   fontWeight: FontWeight.normal),
                             ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  height: height * 0.050,
-                                  width: width * 0.050,
-                                  child: Image.asset(
-                                    'assets/images/Location.png',
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                const Text(
-                                  "In Dubai Office",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      color: CustomColor.homepageBgColor,
-                                      fontWeight: FontWeight.normal),
-                                ),
-                              ],
-                            ),
+                            // Row(
+                            //   children: [
+                            //     SizedBox(
+                            //       height: height * 0.050,
+                            //       width: width * 0.050,
+                            //       child: Image.asset(
+                            //         'assets/images/Location.png',
+                            //       ),
+                            //     ),
+                            //     const SizedBox(
+                            //       width: 5,
+                            //     ),
+                            //     const Text(
+                            //       "In Dubai Office",
+                            //       style: TextStyle(
+                            //           fontSize: 15,
+                            //           color: CustomColor.homepageBgColor,
+                            //           fontWeight: FontWeight.normal),
+                            //     ),
+                            //   ],
+                            // ),
                           ],
                         )
                       ],

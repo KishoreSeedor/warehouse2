@@ -11,6 +11,7 @@ import '../put_away_model/putaway_orderline_model.dart';
 
 class PutAwayBarCodeScanner extends StatefulWidget {
   String scanValue;
+
   PutAwayBarCodeScanner({super.key, required this.scanValue});
 
   @override
@@ -38,7 +39,9 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
 
       print('entering product scan');
       for (var i = 0; i < data.allOrderLineProd.length; i++) {
+        print(data.allOrderLineProd[i].skuId + '----' + id + 'sku id check');
         if (data.allOrderLineProd[i].skuId == id) {
+          print('--------same location product-----');
           putAwayOrdersModel = data.allOrderLineProd[i];
           setState(() {});
           break;
@@ -47,28 +50,53 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
       if (putAwayOrdersModel.locationBarcode != null ||
           putAwayOrdersModel.locationBarcode != '') {
         print('null check operator is working');
+        print(locationDestination +
+            putAwayOrdersModel.locationBarcode +
+            '------>>> scan');
         if (locationDestination == putAwayOrdersModel.locationBarcode) {
+          print('welcome welcome');
           await data.correctproductUpdateInpallet(
               context: context, id: putAwayOrdersModel.id);
-        }else{
-          print('null check operator is working as empty');
-          MyCustomAlertDialog().showCustomAlertdialog(
-              context: context,
-              title: 'Note',
-              button: true,
-              onTapCancelButt: () {
-                Navigator.of(context).pop();
-              },
-              subtitle:
-                  'The entered Bin $locationDestination does not match the expected value $id. Do you want to use it anyway',
-              onTapOkButt: () {
-                data.wrongproductUpdateInPallet(
-                    context: context, id: id, locationId: locationDestination);
-              });
+        } else {
+          print('----->>>>>  location wrong');
+          data
+              .checkLocationApi(
+                  locationId: locationDestination, context: context)
+              .then((result) {
+            print('-------------$result');
+            if (result[0] == 200) {
+              print(result);
+              if (putAwayOrdersModel.id == '') {
+                print('----->>>>>  producr wrong ');
+                MyCustomAlertDialog().showCustomAlertdialog(
+                    context: context,
+                    title: "Note",
+                    subtitle: "Please scan a valid product",
+                    onTapOkButt: () {
+                      Navigator.of(context).pop();
+                    });
+              } else {
+                print('null check operator is working as empty');
+                MyCustomAlertDialog().showCustomAlertdialog(
+                    context: context,
+                    title: 'Note',
+                    button: true,
+                    onTapCancelButt: () {
+                      Navigator.of(context).pop();
+                    },
+                    subtitle:
+                        'The entered Bin does not match the expected value. Do you want to use it anyway',
+                    onTapOkButt: () {
+                      data.wrongproductUpdateInPallet(
+                          context: context,
+                          id: putAwayOrdersModel.id,
+                          locationId: result[1][0]["id"].toString());
+                    });
+              }
+            }
+          });
         }
-      } else {
-       
-      }
+      } else {}
       // } else {
       //   MyCustomAlertDialog().showCustomAlertdialog(
       //       context: context,
@@ -120,6 +148,7 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
 
   int quantity = 0;
   Future<void> _getQRcode(Barcode qrCode, MobileScannerArguments? args) async {
+    final data = Provider.of<PutAwayOrderLineProvid>(context, listen: false);
     print(qrCode.rawValue.toString() + '----->> QR CODE--->>');
 
     if (locationDestination != '') {
@@ -130,14 +159,31 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
     }
 
     if (locationDestination == '' &&
-        qrCode.rawValue.toString().toLowerCase().substring(0, 3).toString() == 'loc') {
-      print('----->> LOC LOC--->>');
-      await cameraController.stop();
-      locationDestination = qrCode.rawValue.toString();
-      setState(() {
-        print(locationDestination);
+        qrCode.rawValue.toString().toLowerCase().substring(0, 3).toString() ==
+            'loc') {
+      data
+          .checkLocationApi(
+              context: context, locationId: qrCode.rawValue.toString())
+          .then((value) async {
+        if (value[0] == 200) {
+          await cameraController.stop();
+          locationDestination = qrCode.rawValue.toString();
+          setState(() {
+            print(locationDestination);
+          });
+        } else {
+          print('------->>>> not loc');
+          MyCustomAlertDialog().showCustomAlertdialog(
+              context: context,
+              title: 'Note',
+              subtitle: 'Please scan valid location',
+              onTapOkButt: () {
+                Navigator.of(context).pop();
+              });
+        }
       });
-    }
+      print('----->> LOC LOC--->>');
+    } else {}
   }
 
   @override
