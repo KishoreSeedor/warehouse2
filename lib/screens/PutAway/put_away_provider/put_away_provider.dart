@@ -145,6 +145,7 @@ class PutAwayProvider with ChangeNotifier {
           "$baseApiUrl/seedor-api/warehouse/move-to-done/$lineId?clientid=${userDetails.clientID}");
       var jsondata = json.decode(response.body);
       if (response.statusCode == 200) {
+        await putAwayLineApi(context: context);
         Navigator.of(context).pop();
         showSnackBar(context: context, title: 'Successfully Updated');
       } else {

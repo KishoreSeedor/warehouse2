@@ -156,6 +156,7 @@ class _PutAwayOrdersLineScreenState extends State<PutAwayOrdersLineScreen> {
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
                               return PutAwayOrderLineProductWidget(
+                                id: widget.id,
                                 orderlineData:
                                     orderLine.orderlineArrangement[index],
                                 destination:
@@ -187,12 +188,15 @@ class PutAwayOrderLineProductWidget extends StatelessWidget {
   final List<PutawayOrderLineModel> orderlineData;
   final String destination;
   final String locationId;
+  final String id;
 
   const PutAwayOrderLineProductWidget(
       {Key? key,
       required this.orderlineData,
       required this.destination,
-      required this.locationId})
+      required this.locationId,
+      required this.id
+      })
       : super(key: key);
 
   @override

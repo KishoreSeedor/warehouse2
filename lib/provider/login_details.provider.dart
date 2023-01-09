@@ -1,11 +1,28 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../const/custom_base64.dart';
 
 //in this page add loginpage geted details for charing other page
 
 class UserDetails with ChangeNotifier {
   // ignore: non_constant_identifier_names
   String _client_id = "";
+  String _image = '';
+   Uint8List? _imageUrl;
+
+  Uint8List? get imageUrl {
+    if (_image == '') {
+      _imageUrl = base64Decode(customBase64);
+      return _imageUrl;
+    } else {
+      _imageUrl = base64Decode(_image);
+      return _imageUrl;
+    }
+  }
 
   String get clientID {
     if (_client_id == "") {
@@ -59,6 +76,7 @@ class UserDetails with ChangeNotifier {
 
     _name = prefs.getString('name') ?? 'Not yet updated';
     _id = prefs.getString('id') ?? 'Not yet updeated';
+
     notifyListeners();
   }
 }
