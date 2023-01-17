@@ -27,63 +27,60 @@ class BottomWidgets extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Expanded(
-          flex: 3,
-          child: Padding(
-            padding: EdgeInsets.only(left: width * 0.1, right: width * 0.45),
-            child: SizedBox(
-              height: height * 0.04,
-              width: width * 0.1,
-              child: FloatingActionButton.extended(
-                heroTag: null,
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => BarcodeScannerPage(
-                            id: userId,
-                          )));
-                },
-                backgroundColor: CustomColor.yellow,
-                foregroundColor: Colors.black,
-                label: Column(
-                  children: [
-                    Image.asset(
-                      "assets/images/scanner.png",
-                      width: width * 0.09,
-                      height: height * 0.06,
-                    ),
-                  ],
-                ),
+        Padding(
+          padding: EdgeInsets.only(left: width * 0.1, right: width * 0.45),
+          child: SizedBox(
+            height: height * 0.04,
+            width: width * 0.2,
+            child: FloatingActionButton.extended(
+              heroTag: null,
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => BarcodeScannerPage(
+                          id: userId,
+                        )));
+              },
+              backgroundColor: CustomColor.yellow,
+              foregroundColor: Colors.black,
+              label: Column(
+                children: [
+                  Image.asset(
+                    "assets/images/scanner.png",
+                    width: width * 0.09,
+                    height: height * 0.06,
+                  ),
+                ],
               ),
             ),
           ),
         ),
-        Expanded(
-          flex: 1,
-          child: FloatingActionButton(
-            heroTag: null,
-            onPressed: () {
-              Navigator.push(context, opaquePage(const ReceivedMenu()));
-            },
-            backgroundColor: CustomColor.darkwhite,
-            foregroundColor: Colors.black,
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: width * 0.02),
-                  child: Image.asset(
-                    "assets/images/Category.png",
-                    width: width * 0.08,
-                    height: height * 0.05,
-                  ),
-                ),
-                const Text(
-                  "Menu",
-                  style: TextStyle(fontSize: 8),
-                )
-              ],
-            ),
-          ),
-        ),
+        // Expanded(
+        //   flex: 1,
+        //   child: FloatingActionButton(
+        //     heroTag: null,
+        //     onPressed: () {
+        //       Navigator.push(context, opaquePage(const ReceivedMenu()));
+        //     },
+        //     backgroundColor: CustomColor.darkwhite,
+        //     foregroundColor: Colors.black,
+        //     child: Column(
+        //       children: [
+        //         Padding(
+        //           padding: EdgeInsets.only(left: width * 0.02),
+        //           child: Image.asset(
+        //             "assets/images/Category.png",
+        //             width: width * 0.08,
+        //             height: height * 0.05,
+        //           ),
+        //         ),
+        //         const Text(
+        //           "Menu",
+        //           style: TextStyle(fontSize: 8),
+        //         )
+        //       ],
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

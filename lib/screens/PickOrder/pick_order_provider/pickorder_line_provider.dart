@@ -2,14 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
+import 'package:warehouse/screens/PickOrder/pick_ui_design/pick_product_conf.dart';
 import 'package:warehouse/screens/PutAway/utilites/putaway_snackbar.dart';
 
 import '../../../const/config.dart';
 import '../../../provider/login_details.provider.dart';
 import '../../../widgets/custom_alert_dialog.dart';
-import '../pick_model/pick_oder_model.dart';
 import '../pick_model/pick_order_lines_model.dart';
 
 class PickOrderLineProvider with ChangeNotifier {
@@ -41,7 +43,8 @@ class PickOrderLineProvider with ChangeNotifier {
     try {
       _pickOrderLoading = true;
       notifyListeners();
-      final user = Provider.of<UserDetails>(context, listen: false);
+      await userDetails.getAllDetails();
+      final user = UserDetails();
       List<PickLinesModel> getData = [];
       await user.getAllDetails();
 
@@ -50,13 +53,11 @@ class PickOrderLineProvider with ChangeNotifier {
             'session_id=ad9b3d63d0f6e25ada8e6568cf58fa1a599002b9; session_id=11f5121f566165d27cf73b9a28432ad6d0b3597b'
       };
 
-      String clainedId = user.clientID;
-
       var url =
-          "$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${user.clientID}&domain=[('putaway_upadted','!=',True),('picking_id','=',$pickingId)]";
+          "$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${userDetails.clientID}&domain=[('putaway_upadted','!=',True),('picking_id','=',$pickingId)]";
 
       print(
-          "order line -->$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${user.clientID}&domain=[('putaway_upadted','!=',True),('picking_id','=',$pickingId)]");
+          "order line -->$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${userDetails.clientID}&domain=[('putaway_upadted','!=',True),('picking_id','=',$pickingId)]");
 
       http.Response response = await http.get(Uri.parse(url), headers: headers);
       var jsonData = json.decode(response.body);
@@ -77,12 +78,15 @@ class PickOrderLineProvider with ChangeNotifier {
           getData.add(PickLinesModel(
             id: jsonData[i]['id'].toString(),
             locationDest: jsonData[i]['location_barcode'].toString(),
-            locationDestinationName:
-                jsonData[i]['location_id'][1].toString(),
+            locationDestinationName: jsonData[i]['location_id'][1].toString(),
             productId: jsonData[i]['product_id'][0].toString(),
             productname: jsonData[i]['product_id'][1].toString(),
-            quantity: jsonData[i]['product_qty'].toString(),
-            skuId: jsonData[i]['x_sku_line_id'].toString(),
+            quantity: jsonData[i]['qty_done'].toString(),
+            skuId: jsonData[i]['x_sku_id'][1].toString(),
+            locationId: jsonData[i]['location_id'][0].toString(),
+            isPicked: jsonData[i]["is_picked"],
+            companyName: jsonData[i]['company_id'][1].toString(),
+            reference: jsonData[i]['reference'].toString(),
             //             .floor()
             //             .toString(),
           ));
@@ -109,28 +113,32 @@ class PickOrderLineProvider with ChangeNotifier {
         return [response.body, _pickLine];
       } else {
         _pickOrderLoading = false;
-        _pickOrderErrorLoading = false;
+        _pickOrderErrorLoading = true;
         _pickOrderErrorMessage = 'Somthing Went Wrong';
         notifyListeners();
       }
     } on HttpException {
       _pickOrderLoading = false;
-      _pickOrderErrorLoading = false;
+      _pickOrderErrorLoading = true;
       _pickOrderErrorMessage = "No Service Found";
 
       notifyListeners();
     } on SocketException {
       _pickOrderLoading = false;
-      _pickOrderErrorLoading = false;
+      _pickOrderErrorLoading = true;
       _pickOrderErrorMessage = "No Internet Connection";
 
       notifyListeners();
     } on FormatException {
       _pickOrderLoading = false;
-      _pickOrderErrorLoading = false;
+      _pickOrderErrorLoading = true;
       _pickOrderErrorMessage = "Invalid Data Format";
 
       notifyListeners();
+    } catch (e) {
+      _pickOrderLoading = false;
+      _pickOrderErrorLoading = true;
+      _pickOrderErrorMessage = "Something went wrong";
     }
   }
 
@@ -205,11 +213,20 @@ class PickOrderLineProvider with ChangeNotifier {
   MyCustomAlertDialog customAlertDialog = MyCustomAlertDialog();
   UserDetails userDetails = UserDetails();
 
-  Future<dynamic> updateProductTopick(
-      {required BuildContext context,
-      required String id,
-      required String locationid}) async {
+  bool _updateLoading = false;
+  bool get updateLoading {
+    return _updateLoading;
+  }
+
+  Future<dynamic> updateProductTopick({
+    required BuildContext context,
+    required String id,
+    required String locationid,
+    required String pickingId,
+  }) async {
     try {
+      _updateLoading = true;
+      notifyListeners();
       userDetails.getAllDetails();
       var headers = {
         'Cookie':
@@ -218,20 +235,26 @@ class PickOrderLineProvider with ChangeNotifier {
 
       var response = await http.put(
           Uri.parse(
-              '$baseApiUrl/seedor-api/warehouse/rearrange-bin/$id?clientid=${userDetails.clientID}&verified_by=2&location_id=8'),
+              "$baseApiUrl/seedor-api/warehouse/pick-products/$id?clientid=${userDetails.clientID}&verified_by=${userDetails.id}&location_id=$locationid"),
           headers: headers);
       print(
-          '$baseApiUrl/seedor-api/warehouse/rearrange-bin/$id?clientid=${userDetails.clientID}&verified_by=2&location_id=8');
+          '$baseApiUrl/seedor-api/warehouse/pick-products/$id?clientid=${userDetails.clientID}&verified_by=${userDetails.id}&location_id=$locationid');
+      var jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
+        await pickOrderLineAPI(context: context, pickingId: pickingId);
         showSnackBar(context: context, title: 'Successfully Updated');
+
         Navigator.of(context).pop();
+
+        _updateLoading = false;
+        notifyListeners();
       } else {
-        _orderlineLoading = false;
-        _orderlineErrorLoading = false;
+        _updateLoading = false;
+
         customAlertDialog.showCustomAlertdialog(
             context: context,
             title: 'Sorry',
-            subtitle: "Something went wrong",
+            subtitle:jsonData["Details"]?? "Something went wrong",
             onTapOkButt: () {
               Navigator.of(context).pop();
             });
@@ -239,8 +262,7 @@ class PickOrderLineProvider with ChangeNotifier {
         notifyListeners();
       }
     } on HttpException {
-      _orderlineLoading = false;
-      _orderlineErrorLoading = false;
+      _updateLoading = false;
       customAlertDialog.showCustomAlertdialog(
           context: context,
           title: 'Sorry',
@@ -251,8 +273,7 @@ class PickOrderLineProvider with ChangeNotifier {
 
       notifyListeners();
     } on SocketException {
-      _orderlineLoading = false;
-      _orderlineErrorLoading = false;
+      _updateLoading = false;
       customAlertDialog.showCustomAlertdialog(
           context: context,
           title: 'Sorry',
@@ -263,8 +284,7 @@ class PickOrderLineProvider with ChangeNotifier {
 
       notifyListeners();
     } on FormatException {
-      _orderlineLoading = false;
-      _orderlineErrorLoading = false;
+      _updateLoading = false;
       customAlertDialog.showCustomAlertdialog(
           context: context,
           title: 'Sorry',
@@ -275,8 +295,7 @@ class PickOrderLineProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      _orderlineLoading = false;
-      _orderlineErrorLoading = false;
+      _updateLoading = false;
       customAlertDialog.showCustomAlertdialog(
           context: context,
           title: 'Sorry',
@@ -286,5 +305,77 @@ class PickOrderLineProvider with ChangeNotifier {
           });
       notifyListeners();
     }
+  }
+
+  PickLinesModel? _pickSinglelinemodel;
+
+  PickLinesModel? get pickSinglelinemodel {
+    return _pickSinglelinemodel;
+  }
+
+  pickProductScanner({
+    required BuildContext context,
+    required String pickingId,
+  }) {
+    MobileScannerController cameraController = MobileScannerController();
+    Future<void> _getQRcode(
+        Barcode qrCode, MobileScannerArguments? args) async {
+      String barcode = qrCode.rawValue.toString();
+      print('qr code data value ------>>> $barcode');
+      cameraController.stop();
+
+      print(barcode + '----- + ');
+      for (var i = 0; i < _pickLine.length; i++) {
+        print('-- $barcode ----- + ${_pickLine[i].skuId}');
+        if (barcode == _pickLine[i].skuId && _pickLine[i].isPicked == false) {
+          _pickSinglelinemodel = _pickLine[i];
+          if (_pickLine[i].isPicked == false) {
+            Navigator.of(context).pop();
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (ctx) => PickProductConfirmation(
+                      pickingId: pickingId,
+                      pickLinesModel: _pickSinglelinemodel!,
+                    )));
+          } else {
+            customAlertDialog.showCustomAlertdialog(
+                context: context,
+                title: 'Note',
+                subtitle: "You have picked this Product Already",
+                onTapOkButt: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                });
+          }
+        }
+      }
+      if (_pickSinglelinemodel == null) {
+        customAlertDialog.showCustomAlertdialog(
+            context: context,
+            title: 'Note',
+            subtitle: "The scanned product is already picked or you have scanned wrong product",
+            onTapOkButt: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            });
+      }
+      print(barcode);
+    }
+
+    return showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Text("Scan Product"),
+            content: Container(
+              height: 200,
+              width: 300,
+              child: MobileScanner(
+                allowDuplicates: false,
+                controller: cameraController,
+                onDetect: _getQRcode,
+              ),
+            ),
+          );
+        });
   }
 }

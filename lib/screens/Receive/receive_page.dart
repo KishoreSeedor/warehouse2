@@ -1,6 +1,13 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:warehouse/screens/PutAway/utilites/empty_screen.dart';
+import 'package:warehouse/screens/PutAway/utilites/error_screen.dart';
+import 'package:warehouse/screens/PutAway/utilites/loading_screen.dart';
+import 'package:warehouse/screens/Receive/pallet_allocation/pallet_allocation_screen.dart';
+import 'package:warehouse/screens/Receive/pallet_allocation/pallet_provider.dart';
+import 'package:warehouse/screens/Receive/pallet_allocation/scan_pallet_alert.dart';
+import 'package:warehouse/screens/Receive/receive_orders_line.dart';
 import '../../const/color.dart';
 import '../../models/reciveorders_model.dart';
 import '../../services/api/recive_api.dart';
@@ -20,6 +27,14 @@ class ReceiveOrders extends StatefulWidget {
 bool _visible = false;
 
 class _ReceiveOrdersState extends State<ReceiveOrders> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<RecieveAPI>(context, listen: false)
+        .recievedoders(context: context);
+  }
+
   AudioPlayer audioPlayer = AudioPlayer();
   late bool hideFilder;
   String? userId;
@@ -34,6 +49,7 @@ class _ReceiveOrdersState extends State<ReceiveOrders> {
 
   @override
   Widget build(BuildContext context) {
+    final recive = Provider.of<RecieveAPI>(context);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return GestureDetector(
@@ -255,7 +271,7 @@ class _ReceiveOrdersState extends State<ReceiveOrders> {
             //         return Row(
             //           children: [
             //             Text(
-            //               snapshot.data!.length.toString(),
+            //              recive.allReciveOrderData.length.toString(),
             //               style: const TextStyle(
             //                   color: CustomColor.blackcolor2,
             //                   fontSize: 23,
@@ -279,101 +295,94 @@ class _ReceiveOrdersState extends State<ReceiveOrders> {
             //     })
           ],
         ),
-        body: FutureBuilder<List<RecivedOrdersModel>?>(
-          future: Provider.of<RecieveAPI>(context, listen: false)
-              .recievedoders(context: context),
-          builder: (context, snapshot) {
-            print(snapshot.data);
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(color: CustomColor.yellow),
-              );
-            } else if (snapshot.hasError) {
-              Center(
-                child: Text(snapshot.error.toString()),
-              );
-            } else if (snapshot.hasData) {
-              print('' + snapshot.data.toString());
-              return snapshot.requireData!.isEmpty
-                  ? Center(
-                      child: Text(
-                        "No Data is Available",
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
+        body: recive.reciveLoading
+            ? LoadingScreenPutAway(title: 'Loading...')
+            : recive.recicveErrorLoading
+                ? ErrorScreenPutAway(title: recive.errorMessage.toString())
+                : recive.allReciveOrderData.isEmpty
+                    ? EmptyScreenPutAway(title: 'No data found')
+                    : ListView.separated(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        itemCount: recive.allReciveOrderData.length,
+                        itemBuilder: (context, index) {
+                          // userId = recive.allReciveOrderData.id;
+                          // print("uservali-->${userId}");
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                  padding: const EdgeInsets.all(13),
+                                  margin: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: CustomColor.gray200,
+                                  ),
+                                  child: ReceivedContainer(
+                                    onTap: () {
+                                      // Navigator.of(context).push(
+                                      //     MaterialPageRoute(
+                                      //         builder: (ctx) =>
+                                      //             PalletAllocationScreen(id: recive
+                                      //                   .allReciveOrderData[index].id,)));
+                                      // Please comment out this line
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  OrdersSelectPage(
+                                                      id: recive
+                                                          .allReciveOrderData[
+                                                              index]
+                                                          .id)));
+
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) =>
+                                      //           OrdersLinePage1(
+                                      //             barcode: recive
+                                      //                 .allReciveOrderData[
+                                      //                     index]
+                                      //                 .barcode,
+                                      //             id: recive.allReciveOrderData[index].id,
+                                      //           )));
+                                      setState(() {
+                                        _visible = false;
+                                      });
+                                    },
+                                    height: height,
+                                    width: width,
+                                    companyName: recive
+                                        .allReciveOrderData[index].companyName,
+                                    createDate: recive
+                                        .allReciveOrderData[index].createDate
+                                        .toString(),
+                                    origin: recive
+                                        .allReciveOrderData[index].origin
+                                        .toString(),
+                                    displayName: recive
+                                        .allReciveOrderData[index].displayName
+                                        .toString(),
+                                  )),
+                            ],
+                          );
+                        },
+                        separatorBuilder:
+                            (BuildContext context, int itemCount) {
+                          return const Divider(
+                            thickness: 2,
+                            color: CustomColor.yellow,
+                          );
+                        },
                       ),
-                    )
-                  : ListView.separated(
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior.onDrag,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        userId = snapshot.data![index].id;
-                        // print("uservali-->${userId}");
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                                padding: const EdgeInsets.all(13),
-                                margin: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: CustomColor.gray200,
-                                ),
-                                child: ReceivedContainer(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                OrdersSelectPage(
-                                                    barcode: snapshot
-                                                        .data![index].id)));
-                                    setState(() {
-                                      _visible = false;
-                                    });
-                                  },
-                                  height: height,
-                                  width: width,
-                                  companyName:
-                                      snapshot.data![index].companyName,
-                                  createDate: snapshot.data![index].createDate
-                                      .toString(),
-                                  origin:
-                                      snapshot.data![index].origin.toString(),
-                                  displayName: snapshot.data![index].displayName
-                                      .toString(),
-                                )),
-                          ],
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int itemCount) {
-                        return const Divider(
-                          thickness: 2,
-                          color: CustomColor.yellow,
-                        );
-                      },
-                    );
-            }
-            return Center(
-              child: Text(
-                'Something went wrong',
-                style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
-              ),
-            );
-          },
-        ),
-        floatingActionButton: BottomWidgets(
-          width: width,
-          height: height,
-          barcode: widget.barcode,
-          userId: userId.toString(),
-        ),
+        // floatingActionButton: BottomWidgets(
+        //   width: width,
+        //   height: height,
+        //   barcode: widget.barcode,
+        //   userId: userId.toString(),
+        // ),
       ),
     );
   }

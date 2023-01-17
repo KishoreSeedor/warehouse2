@@ -196,6 +196,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (loading.isLoading) {
+                            print('hello');
                           } else {
                             submit();
                           }

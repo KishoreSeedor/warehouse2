@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:warehouse/screens/Receive/pallet_allocation/pallet_allocation_screen.dart';
 import 'package:warehouse/widgets/custom_alert_dialog.dart';
 
 import '../const/color.dart';
@@ -1150,6 +1151,7 @@ class _DropdownItemStateState extends State<DropdownItemState> {
 class QualityContainer extends StatefulWidget {
   final String barcode;
   final String userId;
+  final String prodId;
   final TextEditingController? feedBackvalue;
 
   QualityContainer({
@@ -1158,6 +1160,7 @@ class QualityContainer extends StatefulWidget {
     required this.barcode,
     required this.feedBackvalue,
     required this.userId,
+    required this.prodId,
   });
 
   @override
@@ -1165,6 +1168,7 @@ class QualityContainer extends StatefulWidget {
 }
 
 class _QualityContainerState extends State<QualityContainer> {
+  bool isLoading = false;
   TextEditingController? qualityValueController;
   final TextEditingController feedbackController = TextEditingController();
 
@@ -1181,6 +1185,7 @@ class _QualityContainerState extends State<QualityContainer> {
     qualityFuture = RecieveAPI()
         .qualityCheck(context: context, userId: widget.userId)
         .then((value) {
+      print(value.toString() + '----->>>>> question');
       final question = Provider.of<RecieveAPI>(context, listen: false);
 
       if (question.ques.isEmpty) {
@@ -1203,7 +1208,7 @@ class _QualityContainerState extends State<QualityContainer> {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-    final question = Provider.of<RecieveAPI>(context, listen: false);
+    final question = Provider.of<RecieveAPI>(context);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -1399,15 +1404,15 @@ class _QualityContainerState extends State<QualityContainer> {
                                                           FocusScope.of(context)
                                                               .requestFocus(
                                                                   FocusNode());
-                                                          setState(() {
-                                                            selectedValue =
-                                                                newValue;
-                                                            chooseValue =
-                                                                selectedValue
-                                                                    .toString();
-                                                            print(
-                                                                "choosevalue--> $chooseValue");
-                                                          });
+                                                          // setState(() {
+                                                          selectedValue =
+                                                              newValue;
+                                                          chooseValue =
+                                                              selectedValue
+                                                                  .toString();
+                                                          print(
+                                                              "choosevalue--> $chooseValue");
+                                                          // });
                                                         });
                                                   } else {
                                                     return SizedBox(
@@ -1563,72 +1568,27 @@ class _QualityContainerState extends State<QualityContainer> {
                                                     BorderRadius.circular(10)),
                                             child: TextButton(
                                                 onPressed: () {
-                                                  print(selectindex.toString() +
-                                                      '-----selected value-----' +
-                                                      question.ques.length
-                                                          .toString());
-                                                  print(
-                                                      "select-->${selectindex + 1}");
-                                                  if (selectindex + 1 ==
-                                                      question.ques.length) {
-                                                    print(question
-                                                            .ques[selectindex]
-                                                            .value
+                                                  if (isLoading == true) {
+                                                  } else {
+                                                    print(selectindex
                                                             .toString() +
-                                                        '------>>>> question ID');
+                                                        '-----selected value-----' +
+                                                        question.ques.length
+                                                            .toString());
                                                     print(
-                                                        "question length-->${question.ques.length}");
-                                                    RecieveAPI()
-                                                        .qualityValueGet(
-                                                      context: context,
-                                                      feedBack:
-                                                          feedbackController
-                                                              .text
-                                                              .toString(),
-                                                      questionId: question
-                                                          .ques[selectindex].id,
-                                                      answerId: chooseValue
-                                                          .toString(),
-                                                      userId: widget.userId
-                                                          .toString(),
-                                                    )
-                                                        .then((value) {
-                                                      chooseValue = null;
+                                                        "select-->${selectindex + 1}");
+                                                    if (selectindex + 1 ==
+                                                        question.ques.length) {
                                                       print(question
                                                               .ques[selectindex]
                                                               .value
                                                               .toString() +
-                                                          '----->>>> question id');
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                      // Navigator.pushReplacement(
-                                                      //     context,
-                                                      //     MaterialPageRoute(
-                                                      //         builder: (context) =>
-                                                      //             OrdersLinePage1(
-                                                      //                 barcode:
-                                                      //                     widget
-                                                      //                         .barcode,
-                                                      //                 id: widget
-                                                      //                     .userId)));
-                                                    });
-                                                  } else {
-                                                    if (chooseValue == null) {
-                                                      MyCustomAlertDialog()
-                                                          .showCustomAlertdialog(
-                                                              context: context,
-                                                              title: 'Question',
-                                                              subtitle:
-                                                                  "Please select an answer from the given Drop-down",
-                                                              onTapOkButt: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
-                                                              });
-                                                    } else {
+                                                          '------>>>> question ID');
                                                       print(
-                                                          '------->>>>page change');
-
+                                                          "question length-->${question.ques.length}");
+                                                      setState(() {
+                                                        isLoading = true;
+                                                      });
                                                       RecieveAPI()
                                                           .qualityValueGet(
                                                         context: context,
@@ -1645,62 +1605,146 @@ class _QualityContainerState extends State<QualityContainer> {
                                                             .toString(),
                                                       )
                                                           .then((value) {
-                                                        print(
-                                                            '$chooseValue------->>>> then function');
-                                                        if (value == 200) {
-                                                          setState(() {
-                                                            selectindex += 1;
-                                                          });
-                                                          print(question
-                                                                  .ques[
-                                                                      selectindex]
-                                                                  .value
-                                                                  .toString() +
-                                                              '------>>>> question ID');
-                                                          qualityFuture2 =
-                                                              RecieveAPI()
-                                                                  .qualityCheckValue(
-                                                            context: context,
-                                                            valuesId: question
+                                                        setState(() {
+                                                          isLoading = false;
+                                                        });
+                                                        chooseValue = null;
+                                                        print(question
                                                                 .ques[
                                                                     selectindex]
-                                                                .value,
-                                                          );
-                                                          feedbackController
-                                                              .text = '';
-                                                          chooseValue = null;
-                                                          selectedValue = null;
-                                                          widget.feedBackvalue!
-                                                              .text = '';
-                                                          print(selectedValue
-                                                                  .toString() +
-                                                              '----->>> choosen value');
-                                                          print(chooseValue
-                                                                  .toString() +
-                                                              '----->>> choosen value');
-                                                          setState(() {});
-                                                        } else {
-                                                          MyCustomAlertDialog()
-                                                              .showCustomAlertdialog(
-                                                                  context:
-                                                                      context,
-                                                                  title:
-                                                                      'Question',
-                                                                  subtitle:
-                                                                      'Something went wrong',
-                                                                  onTapOkButt:
-                                                                      () {
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop();
-                                                                  });
-                                                        }
+                                                                .value
+                                                                .toString() +
+                                                            '----->>>> question id');
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        Navigator.of(context).push(
+                                                            MaterialPageRoute(
+                                                                builder: (ctx) =>
+                                                                    PalletAllocationScreen(
+                                                                      id: widget
+                                                                          .barcode,
+                                                                      prodId: widget
+                                                                          .prodId,
+                                                                    )));
+                                                        // Navigator.pushReplacement(
+                                                        //     context,
+                                                        //     MaterialPageRoute(
+                                                        //         builder: (context) =>
+                                                        //             OrdersLinePage1(
+                                                        //                 barcode:
+                                                        //                     widget
+                                                        //                         .barcode,
+                                                        //                 id: widget
+                                                        //                     .userId)));
                                                       });
+                                                    } else {
+                                                      if (chooseValue == null) {
+                                                        MyCustomAlertDialog()
+                                                            .showCustomAlertdialog(
+                                                                context:
+                                                                    context,
+                                                                title:
+                                                                    'Question',
+                                                                subtitle:
+                                                                    "Please select an answer from the given Drop-down",
+                                                                onTapOkButt:
+                                                                    () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                });
+                                                      } else {
+                                                        print(
+                                                            '------->>>>page change');
+                                                        setState(() {
+                                                          isLoading = true;
+                                                        });
+                                                        RecieveAPI()
+                                                            .qualityValueGet(
+                                                          context: context,
+                                                          feedBack:
+                                                              feedbackController
+                                                                  .text
+                                                                  .toString(),
+                                                          questionId: question
+                                                              .ques[selectindex]
+                                                              .id,
+                                                          answerId: chooseValue
+                                                              .toString(),
+                                                          userId: widget.userId
+                                                              .toString(),
+                                                        )
+                                                            .then((value) {
+                                                          setState(() {
+                                                            isLoading = false;
+                                                          });
+                                                          print(
+                                                              '$chooseValue------->>>> then function');
+                                                          if (value == 200) {
+                                                            setState(() {
+                                                              selectindex += 1;
+                                                              isLoading = true;
+                                                            });
+                                                            print(question
+                                                                    .ques[
+                                                                        selectindex]
+                                                                    .value
+                                                                    .toString() +
+                                                                '------>>>> question ID');
+
+                                                            qualityFuture2 =
+                                                                RecieveAPI()
+                                                                    .qualityCheckValue(
+                                                              context: context,
+                                                              valuesId: question
+                                                                  .ques[
+                                                                      selectindex]
+                                                                  .value,
+                                                            );
+                                                            feedbackController
+                                                                .text = '';
+                                                            chooseValue = null;
+                                                            selectedValue =
+                                                                null;
+                                                            widget
+                                                                .feedBackvalue!
+                                                                .text = '';
+                                                            print(selectedValue
+                                                                    .toString() +
+                                                                '----->>> choosen value');
+                                                            print(chooseValue
+                                                                    .toString() +
+                                                                '----->>> choosen value');
+                                                            setState(() {
+                                                              isLoading = false;
+                                                            });
+                                                          } else {
+                                                            MyCustomAlertDialog()
+                                                                .showCustomAlertdialog(
+                                                                    context:
+                                                                        context,
+                                                                    title:
+                                                                        'Question',
+                                                                    subtitle:
+                                                                        'Something went wrong',
+                                                                    onTapOkButt:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                    });
+                                                          }
+                                                        });
+                                                      }
                                                     }
                                                   }
                                                 },
-                                                child:
-                                                    question.ques.length - 1 ==
+                                                child: isLoading
+                                                    ? CircularProgressIndicator(
+                                                        color: Colors.yellow,
+                                                      )
+                                                    : question.ques.length -
+                                                                1 ==
                                                             selectindex
                                                         ? Image.asset(
                                                             "assets/images/tick.png",

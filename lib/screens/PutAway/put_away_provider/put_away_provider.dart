@@ -37,20 +37,19 @@ class PutAwayProvider with ChangeNotifier {
     try {
       _orderlineLoading = true;
 
-      final user = Provider.of<UserDetails>(context, listen: false);
-
       List<PutAwayOrdersModel> loadData = [];
       var headers = {
         'Cookie':
             'session_id=a92b5a9151dc99504afb48b311aadcdbde48fd28; session_id=e2fc46ab8d73ddb088f3406a1ee387a52b0bcbb1'
       };
+      await userDetails.getAllDetails();
 
       var response = await http.get(
           Uri.parse(
-              "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=['%26',('picking_state','=','2'),('state','!=','done')]"),
+              "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${userDetails.clientID}&domain=['%26',('picking_state','=','2'),('state','!=','done')]"),
           headers: headers);
       print(
-          "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${user.clientID}&domain=['%26',('picking_state','=','2'),('state','!=','done')]");
+          "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${userDetails.clientID}&domain=['%26',('picking_state','=','2'),('state','!=','done')]");
       var jsonData = json.decode(response.body);
       // print(jsonData['location_barcode'].toString());
       if (response.statusCode == 200) {
@@ -146,6 +145,7 @@ class PutAwayProvider with ChangeNotifier {
       var jsondata = json.decode(response.body);
       if (response.statusCode == 200) {
         await putAwayLineApi(context: context);
+        Navigator.of(context).pop();
         Navigator.of(context).pop();
         showSnackBar(context: context, title: 'Successfully Updated');
       } else {

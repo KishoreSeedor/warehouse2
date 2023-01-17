@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -28,16 +29,27 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   DateTime timePressedBack = DateTime.now();
   @override
+  String email = "";
+  String name = "";
+  Uint8List? imageUrl;
   void initState() {
     // TODO: implement initState
     super.initState();
-    UserDetails().getAllDetails();
+    getUserDetails();
   }
-  UserDetails userDetails = UserDetails();
+
+  void getUserDetails() async {
+    final userDetails = Provider.of<UserDetails>(context,listen: false);
+    await UserDetails().getAllDetails().then((value) {
+      setState(() {
+        print(userDetails.email + '----->>> email');
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserDetails>(context, listen: false);
-   
+    final userDetails = Provider.of<UserDetails>(context);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return WillPopScope(
@@ -120,8 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.black, width: 3),
-                            image:  DecorationImage(
-                                image: MemoryImage(user.imageUrl!),
+                            image: DecorationImage(
+                                image: MemoryImage(userDetails.imageUrl!),
                                 fit: BoxFit.fill),
                           ),
                         ),
@@ -132,14 +144,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              user.name,
+                              userDetails.name,
                               style: TextStyle(
                                   fontSize: 20,
                                   color: CustomColor.homepageBgColor,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              user.email,
+                              userDetails.email,
                               style: TextStyle(
                                   fontSize: 15,
                                   color: CustomColor.homepageBgColor,
@@ -183,7 +195,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             borderRadius: BorderRadius.circular(10)),
                         child: GestureDetector(
                           onTap: () {
-                            RecieveAPI().recievedoders(context: context);
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -361,89 +372,89 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(
                     height: height * 0.05,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(right: 200),
-                    child: Text(
-                      "Recent Activities",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    height: height * 0.16,
-                    width: width * 0.9,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: CustomColor.yellow,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          flex: 4,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: width * 0.2,
-                                  height: height * 0.2,
-                                  decoration: const BoxDecoration(
-                                    color: CustomColor.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(26),
-                                    child: Image.asset(
-                                      'assets/images/checking.png',
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 20,
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    // ignore: prefer_const_constructors
-                                    Text(
-                                      "You have checked",
-                                      style: TextStyle(
-                                          color: CustomColor.homepageBgColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                    Text(
-                                      "12 Packages",
-                                      style: TextStyle(
-                                          color: CustomColor.homepageBgColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(15),
-                            child: Image.asset(
-                              "assets/images/leftarrow.png",
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                  // const Padding(
+                  //   padding: EdgeInsets.only(right: 200),
+                  //   child: Text(
+                  //     "Recent Activities",
+                  //     style:
+                  //         TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  //   ),
+                  // ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  // Container(
+                  //   height: height * 0.16,
+                  //   width: width * 0.9,
+                  //   decoration: BoxDecoration(
+                  //     borderRadius: BorderRadius.circular(20),
+                  //     color: CustomColor.yellow,
+                  //   ),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     crossAxisAlignment: CrossAxisAlignment.center,
+                  //     children: [
+                  //       Expanded(
+                  //         flex: 4,
+                  //         child: Padding(
+                  //           padding: const EdgeInsets.only(left: 10),
+                  //           child: Row(
+                  //             mainAxisAlignment: MainAxisAlignment.start,
+                  //             children: [
+                  //               Container(
+                  //                 width: width * 0.2,
+                  //                 height: height * 0.2,
+                  //                 decoration: const BoxDecoration(
+                  //                   color: CustomColor.white,
+                  //                   shape: BoxShape.circle,
+                  //                 ),
+                  //                 child: Padding(
+                  //                   padding: const EdgeInsets.all(26),
+                  //                   child: Image.asset(
+                  //                     'assets/images/checking.png',
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               const SizedBox(
+                  //                 width: 20,
+                  //               ),
+                  //               Column(
+                  //                 mainAxisAlignment: MainAxisAlignment.center,
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 children: const [
+                  //                   // ignore: prefer_const_constructors
+                  //                   Text(
+                  //                     "You have checked",
+                  //                     style: TextStyle(
+                  //                         color: CustomColor.homepageBgColor,
+                  //                         fontWeight: FontWeight.bold,
+                  //                         fontSize: 18),
+                  //                   ),
+                  //                   Text(
+                  //                     "12 Packages",
+                  //                     style: TextStyle(
+                  //                         color: CustomColor.homepageBgColor,
+                  //                         fontWeight: FontWeight.bold,
+                  //                         fontSize: 18),
+                  //                   ),
+                  //                 ],
+                  //               )
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       Expanded(
+                  //         flex: 1,
+                  //         child: Padding(
+                  //           padding: const EdgeInsets.all(15),
+                  //           child: Image.asset(
+                  //             "assets/images/leftarrow.png",
+                  //           ),
+                  //         ),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
                 ]),
           ),
         ),

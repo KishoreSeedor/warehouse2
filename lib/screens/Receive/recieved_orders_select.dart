@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../const/color.dart';
 import '../../models/recived_details_model.dart';
 import '../../services/api/recive_api.dart';
@@ -6,9 +7,9 @@ import 'receive_orders_line.dart';
 import 'received_page_container.dart';
 
 class OrdersSelectPage extends StatefulWidget {
-  final String barcode;
+  final String id;
 
-  const OrdersSelectPage({super.key, required this.barcode});
+  const OrdersSelectPage({super.key, required this.id});
 
   static const routename = "orders_page";
 
@@ -28,6 +29,7 @@ class _OrdersSelectPageState extends State<OrdersSelectPage> {
 
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    final snapShot = Provider.of<RecieveAPI>(context).findById(widget.id);
     return Scaffold(
       appBar: AppBar(
         bottom: PreferredSize(
@@ -247,16 +249,7 @@ class _OrdersSelectPageState extends State<OrdersSelectPage> {
           ),
         ],
       ),
-      body: FutureBuilder<RecievedDetails?>(
-          future: RecieveAPI()
-              .particularOrders(context: context, domain: widget.barcode),
-          builder: (context, snapshot) {
-            debugPrint("new Value --> ${snapshot.data}");
-
-            if (snapshot.hasData) {
-              userId = snapshot.data!.id.toString();
-              print('${snapshot.data!}hellos hellos');
-              return SafeArea(
+      body: SafeArea(
                 child: Column(
                   children: [
                     Padding(
@@ -277,7 +270,7 @@ class _OrdersSelectPageState extends State<OrdersSelectPage> {
                             Expanded(
                               flex: 4,
                               child: Text(
-                                snapshot.data!.id.toString(),
+                                snapShot.id.toString(),
                                 style: const TextStyle(
                                     fontSize: 23, fontWeight: FontWeight.bold),
                               ),
@@ -317,31 +310,25 @@ class _OrdersSelectPageState extends State<OrdersSelectPage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => OrdersLinePage1(
-                                          barcode: widget.barcode,
-                                          id: snapshot.data!.id,
+                                          barcode: widget.id,
+                                          
+                                          id: snapShot.id,
                                         )));
                             _visible = false;
                           });
                         },
-                        companyName: snapshot.data!.companyName,
-                        createDate: snapshot.data!.createDate.toString(),
-                        displayName: snapshot.data!.displayName.toString(),
+                        companyName: snapShot.companyName,
+                        createDate: snapShot.createDate.toString(),
+                        displayName: snapShot.displayName.toString(),
                         height: height,
-                        origin: snapshot.data!.origin.toString(),
+                        origin: snapShot.origin.toString(),
                         width: width,
                       ),
                     ),
                   ],
                 ),
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(
-                  color: CustomColor.yellow,
-                ),
-              );
-            }
-          }),
+              ),
+           
       // floatingActionButton: SizedBox(
       //   height: height * 0.06,
       //   width: width * 0.3,

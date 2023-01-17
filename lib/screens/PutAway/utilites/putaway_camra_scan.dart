@@ -23,13 +23,17 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
   MobileScannerController cameraController = MobileScannerController();
   PutawayOrderLineModel putAwayOrdersModel = PutawayOrderLineModel(
       id: '',
-      locationDest: '',
+      palletDest: '',
       productname: '',
       quantity: '',
-      locationDestinationName: '',
+      palletDestinationName: '',
       productId: '',
       skuId: '',
-      locationBarcode: '');
+      locationBarcode: '',
+      prodBreath: 0.0,
+      prodHeight: 0.0,
+      prodlength:0.0
+      );
   String locationDestination = '';
   Future<void> productUpdate({required String id}) async {
     print('product scan start $id');
@@ -61,7 +65,7 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
           print('----->>>>>  location wrong');
           data
               .checkLocationApi(
-                  locationId: locationDestination, context: context)
+                  locationIds: locationDestination, context: context)
               .then((result) {
             print('-------------$result');
             if (result[0] == 200) {
@@ -163,7 +167,7 @@ class _PutAwayBarCodeScannerState extends State<PutAwayBarCodeScanner> {
             'loc') {
       data
           .checkLocationApi(
-              context: context, locationId: qrCode.rawValue.toString())
+              context: context, locationIds: qrCode.rawValue.toString())
           .then((value) async {
         if (value[0] == 200) {
           await cameraController.stop();

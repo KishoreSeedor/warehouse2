@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:warehouse/screens/PutAway/utilites/error_screen.dart';
+import 'package:warehouse/screens/Receive/pallet_allocation/pallet_allocation_screen.dart';
 
 import '../../const/color.dart';
 import '../../models/orders_line_model.dart';
@@ -11,9 +12,13 @@ import '../../services/api/recive_api.dart';
 // ignore: must_be_immutable
 class OrederLinePage2 extends StatefulWidget {
   final String barcode;
+
   final OrderLine value;
-  const OrederLinePage2(
-      {super.key, required this.barcode, required this.value});
+  const OrederLinePage2({
+    super.key,
+    required this.barcode,
+    required this.value,
+  });
 
   @override
   State<OrederLinePage2> createState() => _OrederLinePage2State();
@@ -26,6 +31,7 @@ class _OrederLinePage2State extends State<OrederLinePage2> {
   TextEditingController weightController = TextEditingController();
   TextEditingController heightController = TextEditingController();
   TextEditingController feedBackController = TextEditingController();
+  bool isLoading = false;
 
   PageRouteBuilder opaquePage(Widget page) => PageRouteBuilder(
         opaque: false,
@@ -45,7 +51,7 @@ class _OrederLinePage2State extends State<OrederLinePage2> {
     heightController = TextEditingController();
     heightController.text = widget.value.height;
     feedBackController = TextEditingController();
-
+    print(widget.barcode + '------>>>>>> id???');
     Provider.of<RecieveAPI>(
       context,
       listen: false,
@@ -370,7 +376,7 @@ class _OrederLinePage2State extends State<OrederLinePage2> {
                                           lengthController.text = e;
                                         },
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             color: CustomColor.dimensionColor,
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold),
@@ -381,7 +387,7 @@ class _OrederLinePage2State extends State<OrederLinePage2> {
                                                   BorderRadius.circular(10.0),
                                             ),
                                             filled: true,
-                                            hintStyle: TextStyle(
+                                            hintStyle: const TextStyle(
                                                 color:
                                                     CustomColor.dimensionColor2,
                                                 fontSize: 18,
@@ -564,6 +570,14 @@ class _OrederLinePage2State extends State<OrederLinePage2> {
                                 InkWell(
                                   onTap: () {
                                     Navigator.pop(context);
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (ctx) =>
+                                                PalletAllocationScreen(
+                                                  prodId:
+                                                      widget.value.productId,
+                                                  id: widget.barcode,
+                                                )));
                                     // Navigator.pushReplacement(
                                     //     context,
                                     //     MaterialPageRoute(
@@ -605,7 +619,12 @@ class _OrederLinePage2State extends State<OrederLinePage2> {
                                       borderRadius: BorderRadius.circular(10)),
                                   child: TextButton(
                                     onPressed: () {
-                                      setState(() {
+                                      if (isLoading == true) {
+                                        print('-----Loading');
+                                      } else {
+                                        setState(() {
+                                          isLoading = true;
+                                        });
                                         if (int.parse(
                                                 quantityController.text) <=
                                             int.parse(
@@ -643,10 +662,15 @@ class _OrederLinePage2State extends State<OrederLinePage2> {
                                                       quantityController.text,
                                                   weight: weightController.text)
                                               .then((value) {
+                                            setState(() {
+                                              isLoading = false;
+                                            });
                                             if (value == 200) {
                                               Navigator.pushReplacement(
                                                 context,
                                                 opaquePage(QualityContainer(
+                                                    prodId:
+                                                        widget.value.productId,
                                                     context: context,
                                                     barcode: widget.barcode,
                                                     feedBackvalue:
@@ -655,6 +679,9 @@ class _OrederLinePage2State extends State<OrederLinePage2> {
                                                         widget.value.userid)),
                                               );
                                             } else {
+                                              setState(() {
+                                                isLoading = false;
+                                              });
                                               ErrorScreenPutAway(
                                                 title: "No Question",
                                               );
@@ -716,15 +743,22 @@ class _OrederLinePage2State extends State<OrederLinePage2> {
                                           // );
                                           // QuestionGet().questionGet();
                                         } else {
+                                          setState(() {
+                                            isLoading = false;
+                                          });
                                           globalAlertBox.topAlertBox(
                                               context: context,
                                               text: "Enter Valid Details");
                                         }
-                                      });
+                                      }
                                     },
-                                    child: Image.asset(
-                                      "assets/images/tick.png",
-                                    ),
+                                    child: isLoading
+                                        ? const CircularProgressIndicator(
+                                            color: Colors.yellow,
+                                          )
+                                        : Image.asset(
+                                            "assets/images/tick.png",
+                                          ),
                                   ),
                                 ),
                               ],

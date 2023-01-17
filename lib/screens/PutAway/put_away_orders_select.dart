@@ -144,31 +144,32 @@ class _PutAwayOrdersSelectState extends State<PutAwayOrdersSelect> {
             ],
           ),
         ),
-        floatingActionButton: GestureDetector(
-          onTap: () {
-            if(isLoading == true){
+        // floatingActionButton: GestureDetector(
+        //   onTap: () {
+        //     if(isLoading == true){
 
-            }else{
-                setState(() {
-                isLoading = true;
-              });
+        //     }else{
+        //         setState(() {
+        //         isLoading = true;
+        //       });
 
-              data
-                  .validateApi(context: context, lineId: widget.putawayOrder.id)
-                  .then((value) {
-                setState(() {
-                  isLoading = false;
-                });
-              });
-            }
+        //       data
+        //           .validateApi(context: context, lineId: widget.putawayOrder.id)
+        //           .then((value) {
+        //         setState(() {
+        //           isLoading = false;
+        //         });
+        //       });
+        //     }
           
-          },
-          child: Container(
-            color: Colors.yellow,
-            padding: const EdgeInsets.all(10),
-            margin: const EdgeInsets.all(10),
-            child: Text(isLoading? 'Loading':'Validate',style: TextStyle(color: Colors.black),),
-          ),
-        ));
+        //   },
+        //   child: Container(
+        //     color: Colors.yellow,
+        //     padding: const EdgeInsets.all(10),
+        //     margin: const EdgeInsets.all(10),
+        //     child: Text(isLoading? 'Loading':'Validate',style: TextStyle(color: Colors.black),),
+        //   ),
+        // )
+        );
   }
 }

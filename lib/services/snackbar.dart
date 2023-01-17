@@ -25,6 +25,7 @@ class GlobalSnackbar {
 
   successsnackbar({required BuildContext context, required String text}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+
       content: SizedBox(
         height: 40,
         child: Center(
@@ -38,7 +39,7 @@ class GlobalSnackbar {
       margin: const EdgeInsets.all(10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       backgroundColor: CustomColor.yellow,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(seconds: 5),
       behavior: SnackBarBehavior.floating,
     ));
   }
