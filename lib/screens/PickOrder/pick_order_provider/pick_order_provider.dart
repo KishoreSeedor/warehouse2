@@ -44,7 +44,7 @@ class PickOrderProvider with ChangeNotifier {
     try {
       _pickOrderLoading = true;
       notifyListeners();
-      final user = Provider.of<UserDetails>(context, listen: false);
+      final user = UserDetails();
       await user.getAllDetails();
       List<PickOrderModel> getData = [];
       var headers = {

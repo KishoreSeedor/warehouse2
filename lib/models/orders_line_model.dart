@@ -15,6 +15,7 @@ class OrderLine {
     required this.breadth,
     required this.height,
     required this.weight,
+    required this.doneQuantity,
 
     // required this.visible,
     // required this.countEnter,
@@ -36,4 +37,5 @@ class OrderLine {
   String breadth;
   String height;
   String weight;
+  final double doneQuantity;
 }

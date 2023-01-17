@@ -16,9 +16,10 @@ class PutAwayCustomButton extends StatelessWidget {
               onTap();
             })
         : ElevatedButton(
+          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.yellow)),
             onPressed: () {
               onTap();
             },
-            child: Text(title));
+            child: Text(title,style: TextStyle(color: Colors.black),));
   }
 }

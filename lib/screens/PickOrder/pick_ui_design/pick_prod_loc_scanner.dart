@@ -77,8 +77,8 @@ class _PickProdLocationScannerState extends State<PickProdLocationScanner> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: CustomColor.yellow,
-        title: Text(
-            locationDestination == '' ? 'Location Scanner' : 'Product Scanner'),
+        title:const Text(
+           'Product Scanner'),
         actions: [
           IconButton(
             color: Colors.white,
@@ -142,10 +142,10 @@ class _PickProdLocationScannerState extends State<PickProdLocationScanner> {
           ),
           Row(
             children: [
-              Text(
-                'Your Location is $locationDestination',
-                style: TextStyle(fontSize: 20),
-              ),
+              // Text(
+              //   'Your Location is $locationDestination',
+              //   style: TextStyle(fontSize: 20),
+              // ),
               // Row(
               //   children: [
               //     TextField(

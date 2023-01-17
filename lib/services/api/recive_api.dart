@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as https;
 import 'package:warehouse/const/config.dart';
+import 'package:warehouse/screens/home_page.dart';
 import '../../models/orders_line_model.dart';
 import '../../models/quality_check_questions.dart';
 import '../../models/quality_value.dart';
@@ -21,6 +23,7 @@ import '../snackbar.dart';
 class RecieveAPI with ChangeNotifier {
   GlobalSnackbar globalSnackBar = GlobalSnackbar();
   GlobalAlertBox globalAlertBox = GlobalAlertBox();
+  UserDetails userDetails = UserDetails();
 
   List<String> _updateProd = [];
 
@@ -49,15 +52,20 @@ class RecieveAPI with ChangeNotifier {
     }
   }
 
-  List<RecivedOrdersModel> _rec = [];
+  List<RecivedOrdersModel> _allReciveOrderData = [];
   RecievedDetails? _par;
   List<QualityQuestions> _ques = [];
   List<QualityQuestionsValue> _quesValue = [];
-  List<OrderLine> _ord = [];
 
-  List<RecivedOrdersModel> get rec {
+  List<OrderLine> _reciveOrderLineData = [];
+
+  List<OrderLine> get reciveOrderLineData {
+    return _reciveOrderLineData;
+  }
+
+  List<RecivedOrdersModel> get allReciveOrderData {
     // ignore: unrelated_type_equality_checks
-    return _rec;
+    return _allReciveOrderData;
     // if (_rec == "") {
     //   _rec = "Not yet updated" as List<RecivedOrdersModel>;
 
@@ -100,6 +108,8 @@ class RecieveAPI with ChangeNotifier {
     return _isError;
   }
 
+  List<OrderLine> _ord = [];
+
   List<OrderLine> get ord {
     return _ord;
     // if (_ord == "") {
@@ -110,13 +120,22 @@ class RecieveAPI with ChangeNotifier {
     // }
   }
 
-  Future<List<RecivedOrdersModel>> recievedoders(
-      {required BuildContext context}) async {
-    _isLoading = true;
+  bool _reciveLoading = false;
+  bool get reciveLoading {
+    return _reciveLoading;
+  }
 
-    final user = Provider.of<UserDetails>(context, listen: false);
+  bool _reciveErrorLoading = false;
 
-    await user.getAllDetails();
+  bool get recicveErrorLoading {
+    return _reciveErrorLoading;
+  }
+
+  Future<dynamic> recievedoders({required BuildContext context}) async {
+    _reciveLoading = true;
+    _reciveErrorLoading = false;
+    _errorMessage = "";
+    await userDetails.getAllDetails();
     List<RecivedOrdersModel>? result;
     List<RecivedOrdersModel> getOrders = [];
 
@@ -125,14 +144,13 @@ class RecieveAPI with ChangeNotifier {
           'session_id=ad9b3d63d0f6e25ada8e6568cf58fa1a599002b9; session_id=830516724d3bb81b684f4a9457d7f11cb28ba537'
     };
 
-    String clinedId = user.clientID;
+    String clinedId = userDetails.clientID;
 
     print("cId---> $clinedId");
 
     var url =
-        "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=$clinedId&domain=[('picking_state','=','1')]";
-    print(
-        "first http-->$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=$clinedId&domain=[('picking_state','=','1')]");
+        "$baseApiUrl/seedor-api/warehouse/received-orders?fields={'id','scheduled_date','origin','display_name','date','partner_id','create_date','barcode'}&clientid=${userDetails.clientID}&domain=[('picking_state','=','1')]";
+    print(url);
     try {
       https.Response response =
           await https.get(Uri.parse(url), headers: headers);
@@ -174,44 +192,52 @@ class RecieveAPI with ChangeNotifier {
           print('partner--> ${getOrders[i].partnerId.toString()}');
         }
 
-        _rec = getOrders;
-        print(rec.length.toString() + "---> fav data length");
-        _isLoading = false;
-        print('NNNNNN' + getOrders.toString());
-        // notifyListeners();
+        _allReciveOrderData = getOrders;
+
+        _reciveLoading = false;
+
+        notifyListeners();
         return getOrders;
       } else {
-        _isLoading = false;
-        // notifyListeners();
-
-        print(response.reasonPhrase! + 'last response');
-        return result!;
+        _reciveLoading = false;
+        _reciveErrorLoading = true;
+        _errorMessage = jsonData["Details"] ?? "Something went wrong";
+        notifyListeners();
       }
     } on HttpException catch (e) {
-      debugPrint("login api error --> ${e.message}");
-      await globalSnackBar.genarelSnackbar(
-          context: context, text: e.message.toString());
-      return result!;
+      _reciveLoading = false;
+      _reciveErrorLoading = true;
+      _errorMessage = e.message;
+      notifyListeners();
     } on SocketException {
-      _isLoading = false;
-      _isError = false;
-      _errorMessage = "No Internet Connection";
+      _reciveLoading = false;
+      _reciveErrorLoading = true;
+      _errorMessage = "No internet connection";
+      notifyListeners();
       return result!;
     } on FormatException {
-      _isLoading = false;
-      _isError = false;
+      _reciveLoading = false;
+      _reciveErrorLoading = true;
       _errorMessage = "Invalid Data Format";
-      return result!;
+      notifyListeners();
     } catch (e) {
-      return Future.error(e.toString());
+      _reciveLoading = false;
+      _reciveErrorLoading = true;
+      _errorMessage = "Something went wrong";
+      notifyListeners();
     }
+  }
+
+  RecivedOrdersModel findById(String id) {
+    return _allReciveOrderData
+        .firstWhere((element) => element.id.toLowerCase() == id);
   }
 
   Future<RecievedDetails?> particularOrders(
       {required BuildContext context, required String domain}) async {
     _isLoading = true;
 
-    final user = Provider.of<UserDetails>(context, listen: false);
+    final user = UserDetails();
 
     await user.getAllDetails();
 
@@ -261,7 +287,7 @@ class RecieveAPI with ChangeNotifier {
         // notifyListeners();
         print(par);
 
-        print(rec.length.toString() + "---> fav data length");
+        // print(rec.length.toString() + "---> fav data length");
         // _isLoading = false;
         print('SSSSSS' + getDetails.toString());
       } else {
@@ -290,11 +316,13 @@ class RecieveAPI with ChangeNotifier {
     return _par;
   }
 
-  Future<List<OrderLine>> orderLine(
+  Future<dynamic> orderLine(
       {required BuildContext context,
-      required String domain,
+      // required String domain,
       required String pickingId}) async {
-    _isLoading = true;
+    _reciveLoading = true;
+    _reciveErrorLoading = false;
+    _errorMessage = "";
 
     var user = Provider.of<UserDetails>(context, listen: false);
 
@@ -307,18 +335,16 @@ class RecieveAPI with ChangeNotifier {
           'session_id=ad9b3d63d0f6e25ada8e6568cf58fa1a599002b9; session_id=11f5121f566165d27cf73b9a28432ad6d0b3597b'
     };
 
-    String clainedId = user.clientID;
-
     var url =
-        "$baseApiUrl/seedor-api/warehouse/received-order-line?fields={'product_id','product_uom_qty','quantity_done','picking_partner_id','display_name','picking_id','barcode','x_sku_id','x_length','x_breadth','x_height','x_dimension','x_weight'}&clientid=$clainedId&domain=[('picking_id','=',$pickingId)]";
+        "$baseApiUrl/seedor-api/warehouse/received-order-line?fields={'product_id','product_uom_qty','quantity_done','picking_partner_id','display_name','picking_id','barcode','x_sku_id','x_length','x_breadth','x_height','x_dimension','x_weight'}&clientid=${userDetails.clientID}&domain=[('picking_id','=',$pickingId)]";
 
-    print(
-        "order line -->$baseApiUrl/seedor-api/warehouse/received-order-line?fields={'product_id','product_uom_qty','quantity_done','picking_partner_id','display_name','picking_id','barcode','x_sku_id','x_length','x_breadth','x_height','x_dimension','x_weight'}&clientid=$clainedId&domain=[('picking_id','=',$pickingId)]");
+    print(url);
 
     try {
       https.Response response =
           await https.get(Uri.parse(url), headers: headers);
       var jsonData = json.decode(response.body);
+      print(response.statusCode.toString() + '----->>>---');
 
       if (response.statusCode == 200) {
         for (var i = 0; i < jsonData.length; i++) {
@@ -341,6 +367,7 @@ class RecieveAPI with ChangeNotifier {
           getDetails.add(OrderLine(
             pickingId: pickingId,
             pickingName: pickingName,
+            doneQuantity: jsonData[i]['quantity_done'],
             displayName: jsonData[i]['display_name'].toString(),
             userid: jsonData[i]['id'].toString(),
             pickingPartnerId: pickingPartnerId,
@@ -362,8 +389,10 @@ class RecieveAPI with ChangeNotifier {
           ));
         }
         print("Barcode2 value --> ${response.body}");
-        _ord = getDetails;
-        // notifyListeners();
+        _reciveOrderLineData = getDetails;
+        _reciveLoading = false;
+
+        notifyListeners();
         print(ord);
 
         print(_ord.length.toString() + "---> fav orderline length");
@@ -373,27 +402,33 @@ class RecieveAPI with ChangeNotifier {
 
         print("${response.reasonPhrase} + order line response");
       } else {
+        _reciveLoading = false;
+        _reciveErrorLoading = true;
+        _errorMessage = jsonData['Details'] ?? "Something went wrong";
+        notifyListeners();
         print("isLoading---loading");
       }
     } on HttpException {
-      _isLoading = false;
-      _isError = false;
+      _reciveLoading = false;
+      _reciveErrorLoading = true;
       _errorMessage = "No Service Found";
+      notifyListeners();
     } on SocketException {
-      _isLoading = false;
-      _isError = false;
+      _reciveLoading = false;
+      _reciveErrorLoading = true;
       _errorMessage = "No Internet Connection";
+      notifyListeners();
     } on FormatException {
-      _isLoading = false;
-      _isError = false;
+      _reciveLoading = false;
+      _reciveErrorLoading = true;
       _errorMessage = "Invalid Data Format";
+      notifyListeners();
     } catch (e) {
-      _isLoading = false;
-      _isError = false;
+      _reciveLoading = false;
+      _reciveErrorLoading = true;
       _errorMessage = "Some thing went wrong";
+      notifyListeners();
     }
-
-    return _ord;
   }
 
   Future<int> orderLineQuantity({
@@ -453,7 +488,9 @@ class RecieveAPI with ChangeNotifier {
         //   pickingId: _par!.id.toString(),
         // )}");
       } else {
-        await globalSnackBar.successsnackbar(context: context, text: "failed");
+        await globalSnackBar.successsnackbar(
+            context: context,
+            text: jsonData["Details"] ?? "Something went wrong");
       }
     } on HttpException {
       _isLoading = false;
@@ -479,9 +516,7 @@ class RecieveAPI with ChangeNotifier {
       {required BuildContext context, required String userId}) async {
     _isLoading = true;
 
-    final user = Provider.of<UserDetails>(context, listen: false);
-
-    await user.getAllDetails();
+    await userDetails.getAllDetails();
 
     List<QualityQuestions> getDetails = [];
 
@@ -489,12 +524,10 @@ class RecieveAPI with ChangeNotifier {
       'Cookie':
           'session_id=8a47612539d2b93909330392d4b6369f5d83dfa9; session_id=b161ecd263cad0ef56bd6055aaaf7a6e0d8b59cd; session_id=f95ae8522f72d7ff05f1a72c60a9ead326f691ca'
     };
-    String clinedId = user.clientID;
 
     var url =
-        "$baseApiUrl/seedor-api/warehouse/quality-check/scenario?clientid=$clinedId&id=$userId&fields={'id','name','possible_ql_values'}";
-    print(
-        "qustion Api --->$baseApiUrl/seedor-api/warehouse/quality-check/scenario?clientid=$clinedId&id=$userId&fields={'id','name','possible_ql_values'} ");
+        "$baseApiUrl/seedor-api/warehouse/quality-check/scenario?clientid=${userDetails.clientID}&id=$userId&fields={'id','name','possible_ql_values'}";
+    print(url);
     try {
       https.Response response =
           await https.get(Uri.parse(url), headers: header);
@@ -544,9 +577,7 @@ class RecieveAPI with ChangeNotifier {
       {required BuildContext context, required String valuesId}) async {
     _isLoading = true;
 
-    final user = Provider.of<UserDetails>(context, listen: false);
-
-    await user.getAllDetails();
+    await userDetails.getAllDetails();
 
     List<QualityQuestionsValue> getDetails = [];
 
@@ -554,12 +585,11 @@ class RecieveAPI with ChangeNotifier {
       'Cookie':
           'session_id=8a47612539d2b93909330392d4b6369f5d83dfa9; session_id=b161ecd263cad0ef56bd6055aaaf7a6e0d8b59cd; session_id=f95ae8522f72d7ff05f1a72c60a9ead326f691ca'
     };
-    String clinedId = user.clientID;
+    // String clinedId = user.clientID;
 
     var url =
-        "$baseApiUrl/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value";
-    print(
-        "qustionValue Api --->$baseApiUrl/seedor-api/warehouse/quatity-check/dropdown?clientid=$clinedId&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value");
+        "$baseApiUrl/seedor-api/warehouse/quatity-check/dropdown?clientid=${userDetails.clientID}&domain=[('id','=',$valuesId)]&fields={'id','name'}&type=quality-test-value";
+    print(url);
     try {
       https.Response response =
           await https.get(Uri.parse(url), headers: header);
@@ -610,7 +640,7 @@ class RecieveAPI with ChangeNotifier {
     required String answerId,
     required String userId,
   }) async {
-    final user = Provider.of<UserDetails>(context, listen: false);
+    final user = UserDetails();
     int statusCode = 0;
     await user.getAllDetails();
 
@@ -659,7 +689,7 @@ class RecieveAPI with ChangeNotifier {
 
   Future<void> receivedFinalValitation(
       {required BuildContext context, required String userId}) async {
-    final user = Provider.of<UserDetails>(context, listen: false);
+    final user = UserDetails();
 
     await user.getAllDetails();
     try {
@@ -676,8 +706,9 @@ class RecieveAPI with ChangeNotifier {
       var jsonData = json.decode(response.body);
       print("valid response-->${response.body}");
       if (response.statusCode == 200) {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => PutAwayOrdersScreen()));
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (ctx) => MyHomePage()),
+            (route) => false);
       } else if (jsonData["Details"] == jsonData["Details"]) {
         globalSnackBar.genarelSnackbar(
             context: context,

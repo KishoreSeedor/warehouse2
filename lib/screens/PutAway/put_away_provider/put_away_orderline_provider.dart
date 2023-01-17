@@ -2,13 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
+import 'package:warehouse/apis/uri_converter.dart';
 import 'package:warehouse/const/config.dart';
 import 'package:warehouse/models/orders_line_model.dart';
+import 'package:warehouse/screens/PutAway/put_away_model/put_away_orderline_model.dart';
 import 'package:warehouse/screens/PutAway/put_away_model/putaway_orderline_model.dart';
 import 'package:warehouse/screens/PutAway/utilites/putaway_snackbar.dart';
 import 'package:warehouse/widgets/custom_alert_dialog.dart';
 
+import '../../../models/location_detail_model.dart';
 import '../../../provider/login_details.provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -33,7 +37,7 @@ class PutAwayOrderLineProvid with ChangeNotifier {
 
   bool _orderlineErrorLoading = false;
   bool get orderlineErrorLoading {
-    return _orderlineLoading;
+    return _orderlineErrorLoading;
   }
 
   String _orderlIneErrorMessage = '';
@@ -45,9 +49,8 @@ class PutAwayOrderLineProvid with ChangeNotifier {
       {required BuildContext context, required String id}) async {
     try {
       _orderlineLoading = true;
-
-      final user = Provider.of<UserDetails>(context, listen: false);
-      userDetails.getAllDetails();
+      _orderlineErrorLoading = false;
+      await userDetails.getAllDetails();
       List<PutawayOrderLineModel> _loaddata = [];
       _orderlineArrangement = [];
       var headers = {
@@ -57,10 +60,10 @@ class PutAwayOrderLineProvid with ChangeNotifier {
 
       var response = await http.get(
           Uri.parse(
-              "$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${user.clientID}&fields={'id','location_barcode','location_dest_id','product_id','product_qty','x_sku_line_id'}&domain=[('putaway_upadted','!=',True),('picking_id','=',$id)]"),
+              "$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${userDetails.clientID}&fields={'id','location_barcode','location_dest_id','product_id','product_qty','x_sku_line_id','result_package_id','qty_done','x_length','x_breadth','x_height','x_weight','x_volume'}&domain=[('putaway_upadted','!=',True),('picking_id','=',$id)]"),
           headers: headers);
       print(
-          "$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${user.clientID}&domain=[('putaway_upadted','!=',True),('picking_id','=',$id)]");
+          "$baseApiUrl/seedor-api/warehouse/put-way-items?clientid=${userDetails.clientID}&fields={'id','location_barcode','location_dest_id','product_id','product_qty','x_sku_line_id','result_package_id','qty_done','x_length','x_breadth','x_height','x_weight','x_volume'}&domain=[('putaway_upadted','!=',True),('picking_id','=',$id)]");
       var jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
         print(response.body);
@@ -68,48 +71,60 @@ class PutAwayOrderLineProvid with ChangeNotifier {
         var jsonData = json.decode(response.body);
         print(jsonData[0]['location_barcode'].toString() +
             '---->> LOCATION BARECODE');
+
         for (var i = 0; i < jsonData.length; i++) {
+          String palletDest =
+              jsonData[i]['result_package_id'].toString() == "false"
+                  ? ""
+                  : jsonData[i]['result_package_id'][0].toString();
+          String palletDestName =
+              jsonData[i]['result_package_id'].toString() == "false"
+                  ? "No pallet Assign"
+                  : jsonData[i]['result_package_id'][1].toString();
           _loaddata.add(PutawayOrderLineModel(
             id: jsonData[i]['id'].toString(),
             locationBarcode: jsonData[i]['location_barcode'].toString(),
-            locationDest: jsonData[i]['location_dest_id'][0].toString(),
-            locationDestinationName:
-                jsonData[i]['location_dest_id'][1].toString(),
+            palletDest: palletDest,
+            palletDestinationName: palletDestName,
             productname: jsonData[i]['product_id'][1].toString(),
-            quantity: jsonData[i]['product_qty'].toString(),
+            quantity: jsonData[i]['qty_done'].toString(),
             productId: jsonData[i]['product_id'][0].toString(),
             skuId: jsonData[i]['x_sku_line_id'].toString(),
+            prodBreath: jsonData[i]['x_breadth'],
+            prodHeight: jsonData[i]['x_height'],
+            prodlength: jsonData[i]['x_length'],
           ));
         }
-
+        print(_allOrderLineProd.length.toString() +
+            '------->>>> all product length');
         _allOrderLineProd = _loaddata;
         _orderlineLoading = false;
         await dataArrangement();
         notifyListeners();
       } else {
         _orderlineLoading = false;
-        _orderlineErrorLoading = false;
+        _orderlineErrorLoading = true;
         _orderlIneErrorMessage = "Something went wrong";
         notifyListeners();
       }
     } on HttpException {
       _orderlineLoading = false;
-      _orderlineErrorLoading = false;
+      _orderlineErrorLoading = true;
       _orderlIneErrorMessage = "No Service Found";
       notifyListeners();
     } on SocketException {
       _orderlineLoading = false;
-      _orderlineErrorLoading = false;
+      _orderlineErrorLoading = true;
       _orderlIneErrorMessage = "No Internet Connection";
       notifyListeners();
     } on FormatException {
       _orderlineLoading = false;
-      _orderlineErrorLoading = false;
+      _orderlineErrorLoading = true;
       _orderlIneErrorMessage = "Invalid Data Format";
       notifyListeners();
     } catch (e) {
       _orderlineLoading = false;
-      _orderlineErrorLoading = false;
+      _orderlineErrorLoading = true;
       _orderlIneErrorMessage = "Some thing went wtong";
       notifyListeners();
     }
@@ -118,23 +133,31 @@ class PutAwayOrderLineProvid with ChangeNotifier {
   List<String> locationDest = [];
   List<String> locationDestination = [];
   List<String> setLocationData = [];
+  List<String> totalCBMpallet = [];
 
   Future<dynamic> dataArrangement() async {
     _orderlineArrangement = [];
     locationDest = [];
+    setLocationData = [];
+    locationDestination = [];
     List<PutawayOrderLineModel> _orderLine = [];
     for (var i = 0; i < _allOrderLineProd.length; i++) {
-      locationDest.add(_allOrderLineProd[i].locationDest);
-      // print(_allOrderLineProd[i].locationDest + '--->> location');
+      locationDest.add(_allOrderLineProd[i].palletDest);
+      print(_allOrderLineProd[i].palletDest + '--->> location');
     }
     setLocationData = locationDest.toSet().toList();
-    // print(data.toList() + ['helloooooooo']);
+    print(setLocationData.toList() + ['helloooooooo']);
     for (var i = 0; i < setLocationData.length; i++) {
-      // print(data[i] + '--->> loop');
+      print(setLocationData[i] + '--->> loop');
       for (var j = 0; j < _allOrderLineProd.length; j++) {
-        if (setLocationData[i].toString() ==
-            _allOrderLineProd[j].locationDest) {
-          locationDestination.add(_allOrderLineProd[j].locationDestinationName);
+        if (setLocationData[i].toString() == _allOrderLineProd[j].palletDest) {
+          // String calculation =
+          //     "${int.parse(_allOrderLineProd[j].prodBreath) * int.parse(_allOrderLineProd[j].prodHeight) * int.parse(_allOrderLineProd[j].prodlength) / 1000} ";
+          // String totalCBM =
+          //     "${int.parse(calculation) * int.parse(_allOrderLineProd[i].quantity)}";
+          locationDestination.add(_allOrderLineProd[j].palletDestinationName);
+          locationDestination.toSet().toList();
+          // totalCBMpallet.add(totalCBM);
           _orderLine.add(_allOrderLineProd[j]);
 
           print('---');
@@ -289,10 +312,17 @@ class PutAwayOrderLineProvid with ChangeNotifier {
     }
   }
 
+  bool _locationLoading = false;
+  bool get locationLoading {
+    return _locationLoading;
+  }
+
   Future<dynamic> checkLocationApi(
-      {required String locationId, required BuildContext context}) async {
+      {required String locationIds, required BuildContext context}) async {
     int statusCode = 0;
     try {
+      _locationLoading = true;
+      notifyListeners();
       userDetails.getAllDetails();
       var headers = {
         'Cookie':
@@ -300,20 +330,34 @@ class PutAwayOrderLineProvid with ChangeNotifier {
       };
       var response = await http.get(
           Uri.parse(
-              "$baseApiUrl/seedor-api/warehouse/location/list?clientid=${userDetails.clientID}&domain=[('barcode','=','$locationId')]&fields={'barcode'}"),
+              "$baseApiUrl/seedor-api/warehouse/location/list?clientid=${userDetails.clientID}&domain=[('barcode','=','$locationIds')]&fields={'barcode','name','occupied_volume','volume'}"),
           headers: headers);
 
       print(
-          "$baseApiUrl/seedor-api/warehouse/location/list?clientid=${userDetails.clientID}&domain=[('barcode','=','$locationId')]&fields={'barcode'}");
+          "$baseApiUrl/seedor-api/warehouse/location/list?clientid=${userDetails.clientID}&domain=[('barcode','=','$locationIds')]&fields={'barcode','name','occupied_volume','volume'}");
       var jsondata = json.decode(response.body);
       statusCode = response.statusCode;
       if (response.statusCode == 200) {
         if (jsondata.isEmpty) {
+          _locationLoading = false;
+          customAlertDialog.showCustomAlertdialog(
+              context: context,
+              onTapOkButt: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              title: 'Note',
+              subtitle: 'Please scan the correct Location');
+          notifyListeners();
           return [205, 'nothing'];
         } else {
+          _locationLoading = false;
+          notifyListeners();
           return [response.statusCode, jsondata];
         }
       } else {
+        _locationLoading = false;
+        notifyListeners();
         MyCustomAlertDialog().showCustomAlertdialog(
             context: context,
             title: 'Sorry',
@@ -324,6 +368,8 @@ class PutAwayOrderLineProvid with ChangeNotifier {
         return [205, 'nothing'];
       }
     } catch (e) {
+      _locationLoading = false;
+      notifyListeners();
       MyCustomAlertDialog().showCustomAlertdialog(
           context: context,
           title: 'Sorry',
@@ -332,6 +378,263 @@ class PutAwayOrderLineProvid with ChangeNotifier {
             Navigator.of(context).pop();
           });
       return [205, 'nothing'];
+    }
+  }
+
+  LocationDetailModel _locationDetailModel = LocationDetailModel(
+      id: "", totalCBMofLocation: 0.0, containCBMofLocation: 0.0, name: "");
+  LocationDetailModel get locationDetailModel {
+    return _locationDetailModel;
+  }
+
+  void clearlocationDetailModel() {
+    _locationDetailModel = LocationDetailModel(
+        containCBMofLocation: 0.0, id: "", name: "", totalCBMofLocation: 0.0);
+    notifyListeners();
+  }
+
+  double locationPercentage = 0.0;
+  String locationScanBalanceValue = "";
+
+  locationscannerDialog({
+    required BuildContext context,
+  }) {
+    MobileScannerController cameraController = MobileScannerController();
+    Future<void> _getQRcode(
+        Barcode qrCode, MobileScannerArguments? args) async {
+      String barcode = qrCode.rawValue.toString();
+      locationScanBalanceValue = "";
+      print('qr code data value ------>>> $barcode');
+      await cameraController.stop();
+
+      await checkLocationApi(locationIds: barcode, context: context)
+          .then((value) {
+        if (value[0] == 200) {
+          print(
+              "${value[1][0]["occupied_volume"]} occupied volume  ${value[1][0]["volume"]} -------->>>>>>> location percentage");
+          double volume =
+              value[1][0]["volume"] == 0.0 ? 1 : value[1][0]["volume"];
+          locationPercentage = (value[1][0]["occupied_volume"] / volume) * 100;
+
+          print(
+              "${(value[1][0]["occupied_volume"] / volume) * 100} -------->>>>>>> location percentage");
+          print(value[1][0]["id"].toString() + '---------->>>> iddd');
+          _locationDetailModel = LocationDetailModel(
+              id: value[1][0]["id"].toString(),
+              totalCBMofLocation: value[1][0]["volume"],
+              containCBMofLocation: value[1][0]["occupied_volume"],
+              name: value[1][0]["name"].toString());
+          locationScanBalanceValue =
+              "${value[1][0]["volume"] - value[1][0]["occupied_volume"]}";
+          Navigator.of(context).pop();
+          notifyListeners();
+        }
+      });
+
+      print(barcode);
+    }
+
+    return showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Text("Scan Location"),
+            content: Container(
+              height: 200,
+              width: 300,
+              child: MobileScanner(
+                allowDuplicates: false,
+                controller: cameraController,
+                onDetect: _getQRcode,
+              ),
+            ),
+          );
+        });
+  }
+
+  List<PutawayOrderLineModel> _palletScanOrderLineModel = [];
+
+  List<PutawayOrderLineModel> get palletScanOrderLineModel {
+    return _palletScanOrderLineModel;
+  }
+
+  void clearpalletScanOrderLineModel() {
+    _palletScanOrderLineModel = [];
+    notifyListeners();
+  }
+
+  double _totalCbmOfProd = 0.0;
+
+  double get totalCbmOfProd {
+    return _totalCbmOfProd;
+  }
+
+  palletscannerDialog({
+    required BuildContext context,
+  }) {
+    MobileScannerController cameraController = MobileScannerController();
+    Future<void> _getQRcode(
+        Barcode qrCode, MobileScannerArguments? args) async {
+      String barcode = qrCode.rawValue.toString();
+      print('qr code data value ------>>> $barcode');
+      _palletScanOrderLineModel = [];
+      await cameraController.stop();
+      _totalCbmOfProd = 0.0;
+      for (var j = 0; j < _allOrderLineProd.length; j++) {
+        print(_allOrderLineProd[j].palletDestinationName +
+            '----->> desnation name');
+        if (barcode == _allOrderLineProd[j].palletDestinationName) {
+          print(barcode +
+              '||||-----|||' +
+              _allOrderLineProd[j].palletDestinationName);
+          String calculation =
+              "${double.parse(_allOrderLineProd[j].prodBreath.toString()) * double.parse(_allOrderLineProd[j].prodHeight.toString()) * double.parse(_allOrderLineProd[j].prodlength.toString())} ";
+          print(
+              "${double.parse(_allOrderLineProd[j].prodBreath.toString())}  ${double.parse(_allOrderLineProd[j].prodHeight.toString())}  ${(double.parse(_allOrderLineProd[j].prodlength.toString()))} / 1000} ");
+          String totalCBM =
+              "${double.parse(calculation) * double.parse(_allOrderLineProd[j].quantity)}";
+          print(
+              "${double.parse(calculation)} + ${double.parse(_allOrderLineProd[j].quantity)}");
+          _totalCbmOfProd += double.parse(totalCBM);
+
+          // locationDestination.add(_allOrderLineProd[j].palletDestinationName);
+          _palletScanOrderLineModel.add(_allOrderLineProd[j]);
+
+          // totalCBMpallet.add(totalCBM);
+          // _orderLine.add(_allOrderLineProd[j]);
+          print(_totalCbmOfProd.toString() + '------->>> total cbm prod');
+          print('---');
+        }
+      }
+
+      Navigator.of(context).pop();
+      notifyListeners();
+
+      print(barcode);
+    }
+
+    return showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Text("Scan Pallet"),
+            content: Container(
+              height: 200,
+              width: 300,
+              child: MobileScanner(
+                allowDuplicates: false,
+                controller: cameraController,
+                onDetect: _getQRcode,
+              ),
+            ),
+          );
+        });
+  }
+
+  bool _locationUptBool = false;
+  bool get locationUptBool {
+    return _locationUptBool;
+  }
+
+  Future<dynamic> updateThePalletLocation({
+    required BuildContext context,
+    required String palletId,
+    required String locationId,
+    required String volume,
+  }) async {
+    try {
+      _locationUptBool = true;
+      notifyListeners();
+      await userDetails.getAllDetails();
+      var headers = {
+        'Content-Type': 'application/json',
+        'Cookie':
+            'session_id=4549a63c0953dcb1c020ce2e79e0f6a75d4d0a64; session_id=486464445ef21244a65ffa34109a1afdd4dceec6'
+      };
+      var body = json.encode({
+        "clientid": userDetails.clientID,
+        "pallet_id": palletId,
+        "location_id": locationId,
+        "volume": volume
+      });
+      print(body);
+      var response = await http.put(
+          UriConverter(
+              "$baseApiUrl/seedor-api/warehouse/update-pallet-location"),
+          headers: headers,
+          body: body);
+      var jsonData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _palletScanOrderLineModel = [];
+        _locationDetailModel = LocationDetailModel(
+            id: "",
+            totalCBMofLocation: 0.0,
+            containCBMofLocation: 0.0,
+            name: "");
+        
+
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        showSnackBar(context: context, title: "Successfully Updated");
+        _locationUptBool = false;
+        notifyListeners();
+      } else {
+        customAlertDialog.showCustomAlertdialog(
+            context: context,
+            title: 'Sorry',
+            subtitle: jsonData["Details"] ?? "Something went wrong",
+            onTapOkButt: () {
+              Navigator.of(context).pop();
+            });
+        _locationUptBool = false;
+        notifyListeners();
+      }
+    } on HttpException {
+      _locationUptBool = false;
+
+      customAlertDialog.showCustomAlertdialog(
+          context: context,
+          title: 'Sorry',
+          subtitle: "No Service Found",
+          onTapOkButt: () {
+            Navigator.of(context).pop();
+          });
+
+      notifyListeners();
+    } on SocketException {
+      _locationUptBool = false;
+
+      customAlertDialog.showCustomAlertdialog(
+          context: context,
+          title: 'Sorry',
+          subtitle: "No Internet Connection",
+          onTapOkButt: () {
+            Navigator.of(context).pop();
+          });
+
+      notifyListeners();
+    } on FormatException {
+      _locationUptBool = false;
+
+      customAlertDialog.showCustomAlertdialog(
+          context: context,
+          title: 'Sorry',
+          subtitle: "Invalid Data Format",
+          onTapOkButt: () {
+            Navigator.of(context).pop();
+          });
+
+      notifyListeners();
+    } catch (e) {
+      customAlertDialog.showCustomAlertdialog(
+          context: context,
+          title: 'Sorry',
+          subtitle: "Something went wrong",
+          onTapOkButt: () {
+            Navigator.of(context).pop();
+          });
+      _locationUptBool = false;
+      notifyListeners();
     }
   }
 }

@@ -36,9 +36,9 @@ class CountTotalIdProvider with ChangeNotifier {
     try {
       _countIdLoading = true;
       notifyListeners();
-      final user = Provider.of<UserDetails>(context, listen: false);
+      final user = UserDetails();
       await user.getAllDetails();
-      var claindId = user.id;
+      var claindId = user.clientID;
       CountTotalModel getData;
 
       var headers = {

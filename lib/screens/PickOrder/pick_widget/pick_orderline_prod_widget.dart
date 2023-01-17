@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:warehouse/screens/PickOrder/pick_model/pick_order_lines_model.dart';
+import 'package:warehouse/screens/PickOrder/pick_order_provider/pickorder_line_provider.dart';
 import 'package:warehouse/screens/PickOrder/pick_ui_design/pick_prod_loc_scanner.dart';
 
 import '../../../const/color.dart';
@@ -10,11 +12,13 @@ class PickProductOrderLineWidget extends StatefulWidget {
   final List<PickLinesModel> pickLinedata;
   final String locationName;
   final String locationId;
+  final String pickingId;
   const PickProductOrderLineWidget(
       {super.key,
       required this.pickLinedata,
       required this.locationName,
-      required this.locationId});
+      required this.locationId,
+      required this.pickingId});
 
   @override
   State<PickProductOrderLineWidget> createState() =>
@@ -31,6 +35,7 @@ class _PickProductOrderLineWidgetState
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
+    final data = Provider.of<PickOrderLineProvider>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -42,12 +47,14 @@ class _PickProductOrderLineWidgetState
             Expanded(
               flex: 2,
               child: PutAwayCustomButton(
-                  title: "Scan Location",
+                  title: "Scan Product",
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (ctx) => PickProdLocationScanner(
-                              locationId: widget.locationId,
-                            )));
+                    data.pickProductScanner(
+                        context: context, pickingId: widget.pickingId);
+                    // Navigator.of(context).push(MaterialPageRoute(
+                    //     builder: (ctx) => PickProdLocationScanner(
+                    //           locationId: widget.locationId,
+                    //         )));
                   }),
             ),
           ],
@@ -56,17 +63,19 @@ class _PickProductOrderLineWidgetState
           return GestureDetector(
             onTap: () {
               // Navigator.pop(context);
-              Navigator.push(
-                context,
-                opaquePage(ScanSerialBox(
-                  pickId: widget.pickLinedata[index].productId,
-                  productLocation: widget.pickLinedata[index].locationDest,
-                )),
-              );
+              // Navigator.push(
+              //   context,
+              //   opaquePage(ScanSerialBox(
+
+              //     pickId: widget.pickLinedata[index].productId,
+              //     productLocation: widget.pickLinedata[index].locationDest,
+              //   )),
+              // );
             },
             child: Container(
               padding: const EdgeInsets.all(17),
               margin: const EdgeInsets.all(10),
+              width: width,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: CustomColor.gray200,
@@ -103,6 +112,31 @@ class _PickProductOrderLineWidgetState
                                   color: CustomColor.blackcolor2),
                             ),
                           ),
+                          Row(
+                            children: [
+                              Text(widget.pickLinedata[index].isPicked? "Picked": "Not Picked",style: TextStyle(color:widget.pickLinedata[index].isPicked? Colors.green: Colors.black,),),
+                              SizedBox(width: 20,),
+                              Container(
+                               
+                                height: height * 0.04,
+                                width: width * 0.1,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black),
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: widget.pickLinedata[index].isPicked
+                                        ? Colors.green
+                                        : Colors.grey[200]),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.done,
+                                    color: widget.pickLinedata[index].isPicked
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
                         ],
                       ),
                     ),

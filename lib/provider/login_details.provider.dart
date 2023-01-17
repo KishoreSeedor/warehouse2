@@ -68,7 +68,7 @@ class UserDetails with ChangeNotifier {
 
   Future<void> getAllDetails() async {
     final prefs = await SharedPreferences.getInstance();
-    _client_id = prefs.getString('clientId') ?? "Not yet updated";
+    _client_id = prefs.getString('clientid') ?? "Not yet updated";
 
     print("preClaint-->${_client_id}");
 

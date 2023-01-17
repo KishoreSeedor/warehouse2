@@ -381,6 +381,7 @@ class _ScanSerialBoxState extends State<ScanSerialBox> {
                                   'You have completed registrations on all orderlines. Do you want to post the order?',
                               onTapOkButt: () {
                                 finalcheck.updateProductTopick(
+                                  pickingId: widget.pickId,
                                     context: context,
                                     id: widget.pickId,
                                     locationid: widget.productLocation);

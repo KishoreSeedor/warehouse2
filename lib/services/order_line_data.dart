@@ -49,19 +49,19 @@ class OrderListFunction {
       {required BuildContext context, required String barcodeId}) async {
     RecivedOrdersModel newDetail;
 
-    final idGet = Provider.of<RecieveAPI>(context, listen: false).rec;
+    final idGet = Provider.of<RecieveAPI>(context, listen: false).allReciveOrderData;
 
     final users = Provider.of<RecieveAPI>(context, listen: false);
 
     for (var i = 0; i < idGet.length; i++) {
-      print("idGet--->${idGet.length}---${idGet[i].id + '--' + barcodeId}");
+      print("idGet--->${idGet.length}---${'${idGet[i].id}--$barcodeId'}");
       if (idGet[i].id == barcodeId) {
         print("idValue1 ${idGet[i].id.toString()}");
 
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => OrdersSelectPage(barcode: barcodeId)));
+                builder: (context) => OrdersSelectPage(id: barcodeId)));
 
         users.particularOrders(context: context, domain: barcodeId);
         break;

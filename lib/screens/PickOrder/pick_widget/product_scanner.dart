@@ -28,7 +28,7 @@ class _PickProductScanWidgetState extends State<PickProductScanWidget> {
 
   Future<dynamic> updateApi({required String id}) async {
     final data = Provider.of<PickOrderLineProvider>(context, listen: false);
-    data.updateProductTopick(context: context, id: id, locationid: id);
+    // data.updateProductTopick(context: context, id: id, locationid: id);
   }
 
   Future<void> _getQRcode(Barcode qrCode, MobileScannerArguments? args) async {

@@ -162,6 +162,7 @@ class _PickOrderLinesScreenState extends State<PickOrderLinesScreen> {
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
                               return PickProductOrderLineWidget(
+                                pickingId: widget.pickingId,
                                   pickLinedata: pickData.pickLine,
                                   locationId: pickData.locationDest[index],
                                   locationName:

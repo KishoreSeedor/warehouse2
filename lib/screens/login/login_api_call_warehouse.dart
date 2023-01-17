@@ -10,6 +10,8 @@ import 'package:warehouse/screens/home_page.dart';
 import 'package:warehouse/widgets/custom_alert_dialog.dart';
 import 'package:http/http.dart' as http;
 
+import '../../provider/login_details.provider.dart';
+
 class LoginWareHouseCall with ChangeNotifier {
   MyCustomAlertDialog alertDialog = MyCustomAlertDialog();
   //LIST OF COMPANY FROM LOGIN API//
@@ -65,7 +67,7 @@ class LoginWareHouseCall with ChangeNotifier {
                   userEmail: userEmail,
                   clientId: jsonData['companies'][0]['clientid'],
                   seedorType: jsonData['companies'][0]['seedortype'])
-              .then((value) {
+              .then((value) async {
             if (value[0] == 200) {
               print(value[1]['clientid'].toString() + '0000');
               var role = value[1]['roles'];
@@ -150,6 +152,7 @@ class LoginWareHouseCall with ChangeNotifier {
 
               // await registerDeviceIdApi(userName: email);
               print("claint-->${value[1]['clientid'].toString()}");
+             
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (ctx) => const MyHomePage()),
                   (route) => false);
@@ -394,7 +397,7 @@ class LoginWareHouseCall with ChangeNotifier {
     prefs.setString('website', website);
     prefs.setStringList('roles', roles);
 
-    prefs.setString('clientId', clientID);
+    prefs.setString('clientid', clientID);
 
     prefs.setString('seedorName', seedorName);
     prefs.setString('companyEmail', companyEmail);
